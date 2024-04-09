@@ -2,8 +2,8 @@ import asyncio
 import datetime
 import json
 import pyttsx3
+import time
 import win32api
-from time import sleep
 from win32gui import GetWindowText, GetForegroundWindow
 from winsdk.windows.media.control import (
     GlobalSystemMediaTransportControlsSessionManager as MediaManager,
@@ -14,15 +14,12 @@ data = json.load(open("config.json"))
 
 EXAM = datetime.datetime.strptime(data["exam_date"], "%Y/%m/%d")
 
-VK_MEDIA_PLAY_PAUSE = 0xB3
-hwcode = win32api.MapVirtualKey(VK_MEDIA_PLAY_PAUSE, 0)
-
 engine = pyttsx3.init()
 
 
 def startup():
     engine.say(
-        f"There are {(EXAM - datetime.datetime.today()).days} days left until your exams. Time to lock in!"
+        f"There are only {(EXAM - datetime.datetime.today()).days} days left until your exams. Time to lock in!"
     )
     engine.runAndWait()
 
@@ -44,7 +41,7 @@ async def main():
                     paused = True
 
                 engine.say(
-                    f"There are {(EXAM - datetime.datetime.today()).days} days left until your exams. Stop procrastinating retard and lock in already!"
+                    f"There are only {(EXAM - datetime.datetime.today()).days} days left until your exams. Stop procrastinating retard or ISIS will be your only entryway into aerospace!"
                 )
                 engine.runAndWait()
 
@@ -52,11 +49,23 @@ async def main():
                 if current_session and paused:
                     await current_session.try_play_async()
 
-                sleep(60)
+                start = time.time()
+                while True:
+                    if window != GetWindowText(GetForegroundWindow()):
+                        break
+                    time.sleep(1)
+                end = time.time()
 
-            sleep(1)
+                text = f"You were procrastinating for {round(end - start)} seconds on {window}! "
+                print(text)
+                engine.say(text + "Absolute dumbass. Do you want to work at McDonalds?")
+                engine.runAndWait()
+
+                time.sleep(60)
+
+            time.sleep(1)
         except:
-            sleep(60)
+            time.sleep(60)
 
 
 if __name__ == "__main__":

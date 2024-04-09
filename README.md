@@ -30,3 +30,5 @@ This runs the script on startup and in the background.
 Enable this else TTS will not work:
 
 ![Run only when user is logged on (checked)](image.png)
+
+You can run the Python script or the executable in `dist/`, **make sure to have `config.json` in the same directory**.
