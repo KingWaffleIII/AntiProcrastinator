@@ -1,3 +1,4 @@
 pywin32
 pyttsx3
 winsdk
+pyinstaller
