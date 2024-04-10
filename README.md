@@ -32,10 +32,10 @@ Example:
 
 ```
 
-- (recommended) Add to Task Scheduler
+- (recommended) Add to Task Scheduler or equivalent (put the executable in `shell:common startup` in Windows Explorer) to run on startup
 
 This runs the script on startup and in the background.
-Enable this else TTS will not work:
+Enable this if you use Task Scheduler else TTS will not work:
 
 ![Run only when user is logged on (checked)](image.png)
 
