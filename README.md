@@ -8,14 +8,14 @@ Features:
 - Monitors the focused window and yells at you if you're procrastinating
     - Matches blacklisted strings in the window name
 - Pauses any media you're playing to yell at you
-- Regularly reminds you how close your exam(s) are
+- Regularly reminds you how close your deadline is
 - Customisable insults
 - Realtime config changes (no need to restart the script)
 
 
 ## Usage:
 
-- Set the `exam_date` in `config.json`
+- Set the `deadline` in `config.json`
 - Add any phrases you want to `blacklist` (e.g. discord, steam) for the focused window in `config.json`
 - Edit the `insults` in `config.json` to your liking
 
@@ -23,7 +23,7 @@ Example:
 
 ```json
 {
-    "exam_date": "2024/05/09",
+    "deadline": "2024/05/09 23:59:59",
     "blacklist": ["discord", "steam"],
     "insults": [
     "Do you want to work at McDonalds?"
