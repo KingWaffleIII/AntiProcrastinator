@@ -19,6 +19,7 @@ AfterProcrastinationActionSet = actions.ActionSet()
 # actions.Exit
 # actions.PlaySound
 # actions.CloseWindow
+# actions.Print
 
 # Wildcards:
 # {deadline} -> get_deadline()
@@ -70,6 +71,9 @@ AfterProcrastinationActionSet.add_actions([
         pause_media=True,
         condition_func=None,
         rate=175
+    ),
+    actions.Print(
+        text="You retard, you were procrastinating for {timer_diff}! {insult}"
     )
 ])
 

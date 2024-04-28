@@ -6,3 +6,4 @@ from .exit import Exit as Exit
 from .play_sound import PlaySound as PlaySound
 from .say import Say as Say
 from .sleep import Sleep as Sleep
+from .print import Print as Print
