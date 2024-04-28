@@ -2,4 +2,4 @@ pywin32
 pyttsx3
 winsdk
 pyinstaller
-playsound
+playsound==1.2.2

@@ -1,6 +1,6 @@
 # AntiProcrastinator
 
-Your computer will yell at you for procrastinating. Yes, I was procrastinating when I made this.
+A Python script that yells at you for doing things you shouldn't be. Yes, I was procrastinating when I made this.
 
 Features:
 
