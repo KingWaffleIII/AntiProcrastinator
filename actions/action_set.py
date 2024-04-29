@@ -2,14 +2,11 @@ from .action import Action
 
 
 class ActionSet:
-    def __init__(self, repeat: bool = False):
+    def __init__(self):
         """
         Creates a set of Actions.
-
-        :param repeat: whether to repeat the set of actions after executing all actions. Only use when using multiprocessing (so you can terminate the ActionSet).
         """
         self.actions = []
-        self.repeat = repeat
 
     def add_action(self, action: Action):
         """
@@ -38,9 +35,6 @@ class ActionSet:
         """
         for action in self.actions:
             await action.execute(*args, **kwargs)
-
-        if self.repeat:
-            await self.execute(*args, **kwargs)
 
     async def execute_action(self, index: int, *args, **kwargs):
         """

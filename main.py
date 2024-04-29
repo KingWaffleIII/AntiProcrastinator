@@ -10,7 +10,7 @@ import actions
 util.config.load_config("config.json")
 
 OnStartupActionSet = actions.ActionSet()
-OnProcrastinationActionSet = actions.ActionSet(repeat=True)
+OnProcrastinationActionSet = actions.ActionSet()
 AfterProcrastinationActionSet = actions.ActionSet()
 
 # Available actions:
@@ -25,57 +25,59 @@ AfterProcrastinationActionSet = actions.ActionSet()
 # {deadline} -> get_deadline()
 # {insult} -> get_insult()
 # {timer_diff} -> get_timer_diff_in_text()
+# {window} -> window
 
-OnStartupActionSet.add_actions([
-    actions.Say(
-        text="Good luck bro, the deadline has passed.",
-        pause_media=True,
-        condition_func=lambda: util.vars.is_deadline_now_diff_negative,
-        rate=175
-    ),
-    actions.Exit(
-        condition_func=lambda: util.vars.is_deadline_now_diff_negative,
-    ),
-    actions.Say(
-        text="{deadline}Time to lock in!",
-        pause_media=True,
-        condition_func=None,
-        rate=175
-    ),
-])
+OnStartupActionSet.add_actions(
+    [
+        actions.Say(
+            text="Good luck bro, the deadline has passed.",
+            pause_media=True,
+            condition_func=lambda: util.vars.is_deadline_now_diff_negative,
+            rate=175,
+        ),
+        actions.Exit(
+            condition_func=lambda: util.vars.is_deadline_now_diff_negative,
+        ),
+        actions.Say(
+            text="{deadline}Time to lock in!",
+            pause_media=True,
+            condition_func=None,
+            rate=175,
+        ),
+    ]
+)
 
-OnProcrastinationActionSet.add_actions([
-    actions.Say(
-        text="{deadline}{insult}",
-        pause_media=True,
-        condition_func=None,
-        rate=175
-    ),
-    actions.Sleep(
-        sleep_time=60,
-    ),
-    actions.Say(
-        text="Nah you're finished, you've been procrastinating for {timer_diff}! {insult}",
-        pause_media=True,
-        condition_func=None,
-        rate=175
-    ),
-    actions.PlaySound(
-        file_path=os.path.dirname(__file__) + r"\\annoying.mp3",
-    )
-])
+OnProcrastinationActionSet.add_actions(
+    [
+        actions.Say(
+            text="{deadline}{insult}", pause_media=True, condition_func=None, rate=175
+        ),
+        actions.Sleep(
+            sleep_time=60,
+        ),
+        actions.Say(
+            text="Nah you're finished, you've been procrastinating for {timer_diff}! {insult}",
+            pause_media=True,
+            condition_func=None,
+            rate=175,
+        ),
+        actions.PlaySound(
+            file_path=os.path.dirname(__file__) + r"\\annoying.mp3",
+        ),
+    ]
+)
 
-AfterProcrastinationActionSet.add_actions([
-    actions.Say(
-        text="You retard, you were procrastinating for {timer_diff}! {insult}",
-        pause_media=True,
-        condition_func=None,
-        rate=175
-    ),
-    actions.Print(
-        text="You retard, you were procrastinating for {timer_diff}! {insult}"
-    )
-])
+AfterProcrastinationActionSet.add_actions(
+    [
+        actions.Print(text="You retard, you were procrastinating for {timer_diff} on {window}!"),
+        actions.Say(
+            text="You retard, you were procrastinating for {timer_diff}! {insult}",
+            pause_media=True,
+            condition_func=None,
+            rate=175,
+        ),
+    ]
+)
 
 
 async def startup():
@@ -83,16 +85,20 @@ async def startup():
 
 
 def procrastination():
-    asyncio.run(OnProcrastinationActionSet.execute())
+    while True:
+        asyncio.run(OnProcrastinationActionSet.execute())
 
 
 async def watch():
     proc = None
     while True:
         window = win32gui.GetWindowText(win32gui.GetForegroundWindow())
-        if any(x in window.lower() for x in util.config.config["blacklist"]):
+        if window != "" and any(
+            x in window.lower() for x in util.config.config["blacklist"]
+        ):
             if proc is None or not proc.is_alive():
                 util.functions.start_timer()
+                util.functions.set_window(window)
                 proc = multiprocessing.Process(target=procrastination)
                 proc.start()
         else:
@@ -105,6 +111,7 @@ async def watch():
                 time.sleep(60)
 
         time.sleep(1)
+
 
 if __name__ == "__main__":
     asyncio.run(startup())
