@@ -60,11 +60,11 @@ OnStartupActionSet.add_actions(
         actions.Say(
             text="Good luck bro, the deadline has passed.",
             pause_media=True,
-            condition_func=lambda: util.vars.is_deadline_now_diff_negative,
+            condition_func=lambda: util.functions.has_deadline_passed(),
             rate=175,
         ),
         actions.Exit(
-            condition_func=lambda: util.vars.is_deadline_now_diff_negative,
+            condition_func=lambda: util.functions.has_deadline_passed(),
         ),
         actions.Say(
             text="{deadline}Time to lock in!",
@@ -78,10 +78,11 @@ OnStartupActionSet.add_actions(
 OnProcrastinationActionSet.add_actions(
     [
         actions.Say(
-            text="{deadline}{insult}", pause_media=True, condition_func=None, rate=175
+            text="{deadline}{insult}", pause_media=True, condition_func=lambda: not util.functions.check_timer_elapsed_time(60), rate=175
         ),
         actions.Sleep(
             sleep_time=60,
+            condition_func=lambda: not util.functions.check_timer_elapsed_time(60),
         ),
         actions.Say(
             text="Nah you're finished, you've been procrastinating for {timer_diff}! {insult}",

@@ -1,8 +1,6 @@
 import datetime
-import os
 import random
 import time
-import sys
 from winsdk.windows.media.control import (
     GlobalSystemMediaTransportControlsSessionManager as MediaManager,
 )
@@ -44,6 +42,14 @@ def get_deadline_now_diff():
     """
     deadline = get_raw_deadline()
     return int((deadline - datetime.datetime.today()).total_seconds())
+
+
+def has_deadline_passed():
+    """
+    Check if the deadline has passed.
+    :return: whether the deadline has passed.
+    """
+    return get_deadline_now_diff() < 0
 
 
 def get_deadline():
