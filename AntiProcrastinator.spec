@@ -6,7 +6,7 @@ a = Analysis(
     ['main.py'],
     pathex=[],
     binaries=[],
-    datas=[],
+    datas=[('annoying.mp3', '.')],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},
@@ -38,3 +38,4 @@ exe = EXE(
 )
 
 # shutil.copyfile('config.json', '{0}/config.json'.format(DISTPATH))
+# shutil.copyfile('annoying.mp3', '{0}/annoying.mp3'.format(DISTPATH))

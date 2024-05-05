@@ -15,7 +15,6 @@ Features:
   - Extending the project and adding your own actions is very simple by simply extending `action.Action`.
   - You can make actions from emailing someone to shutting down your computer.
 
-
 ## Usage:
 
 - [Download the latest release](https://github.com/KingWaffleIII/AntiProcrastinator/releases) and run once.
@@ -44,3 +43,5 @@ Enable this if you use Task Scheduler else TTS will not work:
 ![Run only when user is logged on (checked)](image.png)
 
 You can run the Python script from cloning or the executable from releases, **but make sure to have `config.json` in the same directory**.
+
+Note: when using `actions.PlaySound`, remember to add the sound files to `AntiProcrastinator.spec` if using Pyinstaller.
