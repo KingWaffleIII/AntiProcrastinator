@@ -1,6 +1,8 @@
 import datetime
+import os
 import random
 import time
+import sys
 from winsdk.windows.media.control import (
     GlobalSystemMediaTransportControlsSessionManager as MediaManager,
 )
@@ -71,9 +73,10 @@ def get_insult():
     return config.config["insults"][random.randint(0, len(config.config["insults"]) - 1)]
 
 
-async def pause_media():
+async def pause_media() -> bool:
     """
     Pauses any currently playing media.
+    :return: whether media was paused.
     """
     sessions = await MediaManager.request_async()
     current_session = sessions.get_current_session()
@@ -82,6 +85,9 @@ async def pause_media():
             and current_session.get_playback_info().controls.is_pause_enabled
     ):
         await current_session.try_pause_async()
+        return True
+
+    return False
 
 
 async def play_media():

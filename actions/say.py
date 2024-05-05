@@ -30,9 +30,8 @@ class Say(Action):
             return False
 
         paused = False
-        if not self.pause_media:
-            await util.functions.pause_media()
-            paused = True
+        if self.pause_media:
+            paused = await util.functions.pause_media()
 
         text = util.functions.replace_wildcards(self.text)
 

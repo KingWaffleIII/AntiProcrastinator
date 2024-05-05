@@ -1,6 +1,7 @@
 import playsound
 from typing import Callable
 
+import util
 from .action import Action
 
 
@@ -18,5 +19,7 @@ class PlaySound(Action):
     async def execute(self):
         if not await super().execute():
             return False
+
+        await util.functions.pause_media()
 
         playsound.playsound(self.file_path)

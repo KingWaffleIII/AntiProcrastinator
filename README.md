@@ -18,7 +18,8 @@ Features:
 
 ## Usage:
 
-- Set the `deadline` in `config.json`
+- [Download the latest release](https://github.com/KingWaffleIII/AntiProcrastinator/releases) and run once.
+- Set the `deadline` in the created `config.json`
 - Add any phrases you want to `blacklist` (e.g. discord, steam) for the focused window in `config.json`
 - Edit the `insults` in `config.json` to your liking
 
@@ -42,4 +43,4 @@ Enable this if you use Task Scheduler else TTS will not work:
 
 ![Run only when user is logged on (checked)](image.png)
 
-You can run the Python script or the executable in `dist/`, **make sure to have `config.json` in the same directory**.
+You can run the Python script from cloning or the executable from releases, **but make sure to have `config.json` in the same directory**.
