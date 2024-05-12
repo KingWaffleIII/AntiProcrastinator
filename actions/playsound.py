@@ -38,6 +38,7 @@ class PlaySound(Action):
             return False
 
         import util
+
         await util.functions.pause_media()
 
-        playsound.playsound(self.file_path)
+        playsound.playsound(util.functions.eval_file_path(self.file_path))

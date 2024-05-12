@@ -54,7 +54,7 @@ OnProcrastinationActionSet = actions.ActionSet([
         rate=175,
     ),
     actions.PlaySound(
-        file_path=util.functions.get_runtime_dir() + r"\annoying.mp3",
+        file_path=r"{runtime_dir}\annoying.mp3",
     ),
 ])
 

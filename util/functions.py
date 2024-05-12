@@ -182,12 +182,12 @@ def replace_wildcards(text: str) -> str:
     )
 
 
-def get_runtime_dir() -> str:
+def eval_file_path(text: str) -> str:
     """
-    Get the runtime directory.
-    :return: the runtime directory.
+    Evaluates {runtime_dir} in text.
+    :return: the evaluated text.
     """
-    return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    return text.replace("{runtime_dir}", os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 
 def build_condition_function(function: str, inverse: bool, args: list) -> str:
