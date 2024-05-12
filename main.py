@@ -6,8 +6,8 @@ import time
 import sys
 import win32gui
 
-import util
 import actions
+import util
 
 util.config.load_config("config.json", create=True)
 
@@ -33,80 +33,17 @@ class _Popen(forking.Popen):
                     os.putenv('_MEIPASS2', '')
 
 
-class Process(multiprocessing.Process):
-    _Popen = _Popen
-
-
 OnStartupActionSet = actions.ActionSet()
 OnProcrastinationActionSet = actions.ActionSet()
 AfterProcrastinationActionSet = actions.ActionSet()
 
-# Available actions:
-# actions.Sleep
-# actions.Say
-# actions.Exit
-# actions.PlaySound
-# actions.CloseWindow
-# actions.Print
+OnStartupActionSet.load_json(util.config.config["on_startup"])
+OnProcrastinationActionSet.load_json(util.config.config["on_procrastination"])
+AfterProcrastinationActionSet.load_json(util.config.config["after_procrastination"])
 
-# Wildcards:
-# {deadline} -> get_deadline()
-# {insult} -> get_insult()
-# {timer_diff} -> get_timer_diff_in_text()
-# {window} -> window
 
-OnStartupActionSet.add_actions(
-    [
-        actions.Say(
-            text="Good luck bro, the deadline has passed.",
-            pause_media=True,
-            condition_func=lambda: util.functions.has_deadline_passed(),
-            rate=175,
-        ),
-        actions.Exit(
-            condition_func=lambda: util.functions.has_deadline_passed(),
-        ),
-        actions.Say(
-            text="{deadline}Time to lock in!",
-            pause_media=True,
-            condition_func=None,
-            rate=175,
-        ),
-    ]
-)
-
-OnProcrastinationActionSet.add_actions(
-    [
-        actions.Say(
-            text="{deadline}{insult}", pause_media=True, condition_func=lambda: not util.functions.check_timer_elapsed_time(60), rate=175
-        ),
-        actions.Sleep(
-            sleep_time=60,
-            condition_func=lambda: not util.functions.check_timer_elapsed_time(60),
-        ),
-        actions.Say(
-            text="Nah you're finished, you've been procrastinating for {timer_diff}! {insult}",
-            pause_media=True,
-            condition_func=None,
-            rate=175,
-        ),
-        actions.PlaySound(
-            file_path=os.path.dirname(__file__) + r"\\annoying.mp3",
-        ),
-    ]
-)
-
-AfterProcrastinationActionSet.add_actions(
-    [
-        actions.Print(text="You were procrastinating for {timer_diff} on {window}!"),
-        actions.Say(
-            text="You retard, you were procrastinating for {timer_diff}! {insult}",
-            pause_media=True,
-            condition_func=None,
-            rate=175,
-        ),
-    ]
-)
+class Process(multiprocessing.Process):
+    _Popen = _Popen
 
 
 async def startup():

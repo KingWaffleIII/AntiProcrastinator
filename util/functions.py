@@ -1,6 +1,7 @@
 import datetime
 import random
 import time
+import os
 from winsdk.windows.media.control import (
     GlobalSystemMediaTransportControlsSessionManager as MediaManager,
 )
@@ -32,7 +33,15 @@ def get_raw_deadline():
     :return: the deadline as datetime object.
     """
     config.load_config(config.config_path)
-    return datetime.datetime.strptime(config.config["deadline"], "%Y/%m/%d %H:%M:%S")
+
+    if isinstance(config.config["deadline"], str):
+        return datetime.datetime.strptime(config.config["deadline"], "%Y/%m/%d %H:%M:%S")
+
+    # list of deadlines
+    for i in config.config["deadline"]:
+        # check if datetime has passed
+        if datetime.datetime.strptime(i, "%Y/%m/%d %H:%M:%S") > datetime.datetime.today():
+            return datetime.datetime.strptime(i, "%Y/%m/%d %H:%M:%S")
 
 
 def get_deadline_now_diff():
@@ -65,8 +74,8 @@ def get_deadline():
         diff = int((diff - datetime.timedelta(days=1)).total_seconds() / 60 / 60)
         return f"My brother in Christ, there are only {diff + 24} hours left until your deadline. "
     t = get_time(int(diff.total_seconds()))
-    if any(x in t for x in ["hour", "minute", "second"]):
-        return f"Bro you're cooked, there is only {t} left until your deadline. "
+    # if any(x in t for x in ["hour", "minute", "second"]):
+    #     return f"Bro you're cooked, there is only {t} left until your deadline. "
     return f"Bro you're cooked, there are only {t} left until your deadline. "
 
 
@@ -159,6 +168,7 @@ def replace_wildcards(text: str) -> str:
     {insult} -> get_insult()
     {timer_diff} -> get_timer_diff_in_text()
     {window} -> window
+    {timestamp} -> current timestamp (HH:MM:SS)
     :param text: text to replace wildcards in.
     :return: text with wildcards replaced.
     """
@@ -168,6 +178,46 @@ def replace_wildcards(text: str) -> str:
         .replace("{insult}", get_insult())
         .replace("{timer_diff}", get_timer_diff_in_text())
         .replace("{window}", window)
+        .replace("{timestamp}", datetime.datetime.now().strftime("%H:%M:%S"))
     )
 
 
+def get_runtime_dir() -> str:
+    """
+    Get the runtime directory.
+    :return: the runtime directory.
+    """
+    return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+
+def build_condition_function(function: str, inverse: bool, args: list) -> str:
+    """
+    Builds a condition function from a string for use in actions.
+    :param function: the function that will be evaluated.
+    :param inverse: whether to add "not".
+    :param args: args for the function.
+    :return: a lambda function as a string.
+    """
+    if len(args) != 0:
+        args_str = ''.join([f'{arg},' for arg in args])[:-1]
+    else:
+        args_str = ""
+    if inverse:
+        return f"lambda: not {function}({args_str})"
+    return f"lambda: {function}({args_str})"
+
+
+def deconstruct_condition_function(condition_func: str) -> tuple[str, bool, list]:
+    """
+    Deconstructs a condition function into its parts.
+    :param condition_func: the condition function to deconstruct.
+    :return: a tuple containing the function, whether it is inverted and the args.
+    """
+    condition_func = condition_func.replace("lambda: ", "")
+    inverse = condition_func.startswith("not ")
+    condition_func = condition_func.replace("not ", "")
+    function = condition_func.split("(")[0]
+    args = condition_func.split("(")[1].replace(")", "").split(",")
+    if args == [""]:
+        args = []
+    return function, inverse, args

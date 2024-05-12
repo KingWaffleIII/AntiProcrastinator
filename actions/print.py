@@ -1,25 +1,39 @@
-from typing import Callable
-
-import util
 from .action import Action
 
 
 class Print(Action):
-    def __init__(self, text: str, condition_func: Callable[[], bool] = None, *args, **kwargs):
+    def __init__(self, text: str, condition_func: str = None):
         """
         Creates an action that prints to the console.
         :param text: the text to print.
-        :param condition_func: the condition to check before executing the action, as a function.
+        :param condition_func: the condition to check before executing the action, as a string cast lambda function.
         """
         super().__init__(condition_func)
 
         self.text = text
-        self.args = args
-        self.kwargs = kwargs
+
+    def to_json(self):
+        """
+        Converts the action to JSON.
+        :return: JSON representation of the action.
+        """
+        import util
+
+        if self.raw_condition_func is not None:
+            condition_func_str = util.functions.deconstruct_condition_function(self.raw_condition_func)
+            condition_func = {
+                "function": condition_func_str[0],
+                "inverse": condition_func_str[1],
+                "args": condition_func_str[2]
+            }
+        else:
+            condition_func = None
+        return {"action": "Print", "condition_func": condition_func, "text": self.text}
 
     async def execute(self):
         if not await super().execute():
             return False
 
+        import util
         text = util.functions.replace_wildcards(self.text)
-        print(text, *self.args, **self.kwargs)
+        print(text)

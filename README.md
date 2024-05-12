@@ -10,7 +10,7 @@ Features:
 - Pauses any media you're playing to yell at you
 - Regularly reminds you how close your deadline is
 - Customisable insults
-- Realtime config changes (no need to restart the script)
+- Realtime config changes (no need to restart the program)
 - Completely customisable actions (e.g. play a sound, print to console, etc.)
   - Extending the project and adding your own actions is very simple by simply extending `action.Action`.
   - You can make actions from emailing someone to shutting down your computer.
@@ -21,21 +21,43 @@ Features:
 - Set the `deadline` in the created `config.json`
 - Add any phrases you want to `blacklist` (e.g. discord, steam) for the focused window in `config.json`
 - Edit the `insults` in `config.json` to your liking
+- GUI for customising ActionSets coming soon - for now, you can edit them in `config.json`.
 
-Example:
+  **Example:**
 
-```json
-{
-    "deadline": "2024/05/09 23:59:59",
-    "blacklist": ["discord", "steam"],
-    "insults": [
-    "Do you want to work at McDonalds?"
-    ]
-}
+  ```json5
+  {
+    "action": "Say",  // Action to perform
+    "condition_func": {  // Condition to check before performing action
+      "function": "util.functions.check_timer_elapsed_time",  // Use a function from util.functions
+      "inverse": true,  // Invert the result of the function
+      "args": [  // Arguments to pass to the function
+        "60"
+      ]
+    },
+    "text": "{deadline}{insult}",  // Text to say, can use wildcards (see below)
+    "pause_media": true,  // Pause media before performing action
+    "kwargs": {  // Keyword arguments to pass to the action, for example in Say, the kwargs are sent to the TTS engine
+      "rate": 175
+    }
+  }
+  ```
 
-```
+  - **Available actions:**
+    - `actions.Sleep`
+    - `actions.Say`
+    - `actions.Exit`
+    - `actions.PlaySound`
+    - `actions.CloseWindow`
+    - `actions.Print`
 
-- (recommended) Add to Task Scheduler or equivalent (put the executable in `shell:common startup` in Windows Explorer) to run on startup
+  - **Wildcards:**
+    - `{deadline}` -> `get_deadline()`
+    - `{insult}` -> `get_insult()`
+    - `{timer_diff}` -> `get_timer_diff_in_text()`
+    - `{window}` -> `window`
+  
+- (recommended but optional) Add to Task Scheduler or equivalent (put the executable in `shell:common startup` in Windows Explorer) to run on startup
 
 This runs the script on startup and in the background.
 Enable this if you use Task Scheduler else TTS will not work:

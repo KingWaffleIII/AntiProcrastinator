@@ -1,18 +1,19 @@
-import asyncio
+import playsound
 
 from .action import Action
 
 
-class Sleep(Action):
-    def __init__(self, sleep_time: int, condition_func: str = None):
+class PlaySound(Action):
+    def __init__(self, file_path: str, condition_func: str = None):
         """
-        Creates an action that sleeps (blocking), pausing the ActionSet.
-        :param sleep_time: the time to sleep in seconds.
-        :param condition_func: the condition to check before executing the action, as a function.
+        Creates an action that plays a sound file.
+        Note: if using Pyinstaller, add the sound file to AntiProcrastinator.spec.
+        :param file_path: the path to the sound file.
+        :param condition_func: the condition to check before executing the action, as a string cast lambda function.
         """
         super().__init__(condition_func)
 
-        self.sleep_time = sleep_time
+        self.file_path = file_path
 
     def to_json(self):
         """
@@ -30,12 +31,13 @@ class Sleep(Action):
             }
         else:
             condition_func = None
-        return {"action": "Sleep", "condition_func": condition_func, "sleep_time": self.sleep_time}
+        return {"action": "PlaySound", "condition_func": condition_func, "file_path": self.file_path}
 
     async def execute(self):
         if not await super().execute():
             return False
 
-        await asyncio.sleep(self.sleep_time)
+        import util
+        await util.functions.pause_media()
 
-        return True
+        playsound.playsound(self.file_path)

@@ -1,18 +1,16 @@
-import asyncio
+import win32con
+import win32gui
 
 from .action import Action
 
 
-class Sleep(Action):
-    def __init__(self, sleep_time: int, condition_func: str = None):
+class CloseWindow(Action):
+    def __init__(self, condition_func: str = None):
         """
-        Creates an action that sleeps (blocking), pausing the ActionSet.
-        :param sleep_time: the time to sleep in seconds.
-        :param condition_func: the condition to check before executing the action, as a function.
+        Creates an action that closes the focused window.
+        :param condition_func: the condition to check before executing the action, as a string cast lambda function.
         """
         super().__init__(condition_func)
-
-        self.sleep_time = sleep_time
 
     def to_json(self):
         """
@@ -30,12 +28,13 @@ class Sleep(Action):
             }
         else:
             condition_func = None
-        return {"action": "Sleep", "condition_func": condition_func, "sleep_time": self.sleep_time}
+
+        return {"action": "CloseWindow", "condition_func": condition_func}
 
     async def execute(self):
         if not await super().execute():
             return False
 
-        await asyncio.sleep(self.sleep_time)
+        win32gui.PostMessage(win32gui.GetForegroundWindow(), win32con.WM_CLOSE, 0, 0)
 
         return True

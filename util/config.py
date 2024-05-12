@@ -1,13 +1,7 @@
 import json
 
 config_path = 'config.json'
-config = {
-    "deadline": "2024/05/09 23:59:59",
-    "blacklist": ["discord", "steam"],
-    "insults": [
-        "Do you want to work at McDonalds?"
-    ]
-}
+config = {}
 
 
 def load_config(path: str, create: bool = True):
@@ -23,5 +17,17 @@ def load_config(path: str, create: bool = True):
             config = json.load(f)
     except FileNotFoundError:
         if create:
-            with open(path, 'w') as f:
+            with open(path, 'w+') as f:
+                from actions import defaults
+
+                config = {
+                    "deadline": "2024/05/09 23:59:59",
+                    "blacklist": ["discord", "steam"],
+                    "insults": [
+                        "Do you want to work at McDonalds?"
+                    ],
+                    "on_startup": defaults.OnStartupActionSet.to_json(),
+                    "on_procrastination": defaults.OnProcrastinationActionSet.to_json(),
+                    "after_procrastination": defaults.AfterProcrastinationActionSet.to_json(),
+                }
                 json.dump(config, f, indent=4)
