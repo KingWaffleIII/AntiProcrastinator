@@ -4,3 +4,4 @@ pyttsx3
 winsdk
 playsound==1.2.2
 pyinstaller
+inquirerpy

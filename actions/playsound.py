@@ -3,7 +3,7 @@ import playsound
 from .action import Action
 
 
-class PlaySound(Action):
+class Playsound(Action):
     def __init__(self, file_path: str, condition_func: str = None):
         """
         Creates an action that plays a sound file.
@@ -22,7 +22,7 @@ class PlaySound(Action):
         """
         import util
 
-        if self.raw_condition_func is not None:
+        if self.condition_func is not None:
             condition_func_str = util.functions.deconstruct_condition_function(self.raw_condition_func)
             condition_func = {
                 "function": condition_func_str[0],
@@ -31,7 +31,7 @@ class PlaySound(Action):
             }
         else:
             condition_func = None
-        return {"action": "PlaySound", "condition_func": condition_func, "file_path": self.file_path}
+        return {"action": "Playsound", "condition_func": condition_func, "file_path": self.file_path}
 
     async def execute(self):
         if not await super().execute():

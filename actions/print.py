@@ -19,7 +19,7 @@ class Print(Action):
         """
         import util
 
-        if self.raw_condition_func is not None:
+        if self.condition_func is not None:
             condition_func_str = util.functions.deconstruct_condition_function(self.raw_condition_func)
             condition_func = {
                 "function": condition_func_str[0],

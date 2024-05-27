@@ -1,3 +1,5 @@
+import sys
+
 from .action import Action
 
 
@@ -16,7 +18,7 @@ class Exit(Action):
         """
         import util
 
-        if self.raw_condition_func is not None:
+        if self.condition_func is not None:
             condition_func_str = util.functions.deconstruct_condition_function(self.raw_condition_func)
             condition_func = {
                 "function": condition_func_str[0],
@@ -32,4 +34,4 @@ class Exit(Action):
         if not await super().execute():
             return False
 
-        exit(0)
+        sys.exit(0)

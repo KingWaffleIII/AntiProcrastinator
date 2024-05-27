@@ -3,7 +3,7 @@ import importlib
 from .action import Action
 
 
-class ActionSet:
+class Actionset:
     def __init__(self, actions: list[Action] = None):
         """
         Creates a set of Actions.
@@ -47,8 +47,8 @@ class ActionSet:
                     condition_func['inverse'],
                     condition_func['args']
                 )
-            args = {k: v for k, v in action.items() if k != 'action'}
-            self.actions.append(getattr(module, action['action'])(**args))
+            kwargs = {k: v for k, v in action.items() if k != 'action'}
+            self.actions.append(getattr(module, action['action'])(**kwargs))
 
     def remove_action(self, action: Action):
         """

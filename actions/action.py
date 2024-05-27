@@ -13,6 +13,17 @@ class Action:
         self.condition_func: Callable[[], bool] = eval(condition_func) if condition_func is not None else None
         pass
 
+    def from_json(self, json: list):
+        condition_func = json['condition_func']
+        if condition_func is not None:
+            json['condition_func'] = util.functions.build_condition_function(
+                condition_func['function'],
+                condition_func['inverse'],
+                condition_func['args']
+            )
+        args = {k: v for k, v in json.items() if k != 'action'}
+        return self.__class__(**args)
+
     def to_json(self):
         """
         Converts the action to JSON.
@@ -20,7 +31,7 @@ class Action:
         """
         import util
 
-        if self.raw_condition_func is not None:
+        if self.condition_func is not None:
             condition_func_str = util.functions.deconstruct_condition_function(self.raw_condition_func)
             condition_func = {
                 "function": condition_func_str[0],
@@ -30,7 +41,7 @@ class Action:
         else:
             condition_func = None
 
-        return {"action": "None", "condition_func": condition_func}
+        return {"action": "Action", "condition_func": condition_func}
 
     async def execute(self) -> bool:
         """

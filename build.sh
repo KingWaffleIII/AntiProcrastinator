@@ -1,1 +1,1 @@
-pyinstaller -y AntiProcrastinator.spec
+pyinstaller -y --clean AntiProcrastinator.spec

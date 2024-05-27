@@ -7,8 +7,8 @@ import actions
 # actions.Sleep
 # actions.Say
 # actions.Exit
-# actions.PlaySound
-# actions.CloseWindow
+# actions.Playsound
+# actions.Closewindow
 # actions.Print
 
 # Wildcards:
@@ -21,12 +21,11 @@ import actions
 # Avoid using Python, rather use the available functions in util.functions.
 # If you want to use something not implemented, you can add it to util/functions.py.
 
-OnStartupActionSet = actions.ActionSet([
+OnStartupActionSet = actions.Actionset([
     actions.Say(
         text="Good luck bro, the deadline has passed.",
         pause_media=True,
         condition_func="lambda: util.functions.has_deadline_passed()",
-        rate=175,
     ),
     actions.Exit(
         condition_func="lambda: util.functions.has_deadline_passed()",
@@ -35,13 +34,12 @@ OnStartupActionSet = actions.ActionSet([
         text="{deadline}Time to lock in!",
         pause_media=True,
         condition_func=None,
-        rate=175,
     ),
 ])
 
-OnProcrastinationActionSet = actions.ActionSet([
+OnProcrastinationActionSet = actions.Actionset([
     actions.Say(
-        text="{deadline}{insult}", pause_media=True, condition_func="lambda: not util.functions.check_timer_elapsed_time(60)", rate=175
+        text="{deadline}{insult}", pause_media=True, condition_func="lambda: not util.functions.check_timer_elapsed_time(60)"
     ),
     actions.Sleep(
         sleep_time=60,
@@ -51,19 +49,17 @@ OnProcrastinationActionSet = actions.ActionSet([
         text="Nah you're finished, you've been procrastinating for {timer_diff}! {insult}",
         pause_media=True,
         condition_func=None,
-        rate=175,
     ),
-    actions.PlaySound(
+    actions.Playsound(
         file_path=r"{runtime_dir}\annoying.mp3",
     ),
 ])
 
-AfterProcrastinationActionSet = actions.ActionSet([
+AfterProcrastinationActionSet = actions.Actionset([
     actions.Print(text="[{timestamp}] You were procrastinating for {timer_diff} on {window}!"),
     actions.Say(
         text="You retard, you were procrastinating for {timer_diff}! {insult}",
         pause_media=True,
         condition_func=None,
-        rate=175,
     ),
 ])

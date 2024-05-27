@@ -1,4 +1,5 @@
 import asyncio
+import json
 import multiprocessing
 import multiprocessing.popen_spawn_win32 as forking
 import os
@@ -9,7 +10,15 @@ import win32gui
 import actions
 import util
 
-util.config.load_config("config.json", create=True)
+if not util.config.config_exists("config.json"):
+    print("Config file not found. Please run the configurator first.")
+    sys.exit(1)
+
+try:
+    util.config.load_config("config.json")
+except json.JSONDecodeError:
+    print("Config file is invalid. Please run the configurator.")
+    sys.exit(1)
 
 
 # Freeze support for multiprocessing when using PyInstaller.
@@ -33,9 +42,9 @@ class _Popen(forking.Popen):
                     os.putenv('_MEIPASS2', '')
 
 
-OnStartupActionSet = actions.ActionSet()
-OnProcrastinationActionSet = actions.ActionSet()
-AfterProcrastinationActionSet = actions.ActionSet()
+OnStartupActionSet = actions.Actionset()
+OnProcrastinationActionSet = actions.Actionset()
+AfterProcrastinationActionSet = actions.Actionset()
 
 OnStartupActionSet.load_json(util.config.config["on_startup"])
 OnProcrastinationActionSet.load_json(util.config.config["on_procrastination"])

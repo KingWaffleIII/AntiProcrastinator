@@ -18,38 +18,16 @@ Features:
 ## Usage:
 
 - [Download the latest release](https://github.com/KingWaffleIII/AntiProcrastinator/releases) and run once.
-- Set the `deadline` in the created `config.json`
-- Add any phrases you want to `blacklist` (e.g. discord, steam) for the focused window in `config.json`
-- Edit the `insults` in `config.json` to your liking
-- GUI for customising ActionSets coming soon - for now, you can edit them in `config.json`.
-
-  **Example:**
-
-  ```json5
-  {
-    "action": "Say",  // Action to perform
-    "condition_func": {  // Condition to check before performing action
-      "function": "util.functions.check_timer_elapsed_time",  // Use a function from util.functions
-      "inverse": true,  // Invert the result of the function
-      "args": [  // Arguments to pass to the function
-        "60"
-      ]
-    },
-    "text": "{deadline}{insult}",  // Text to say, can use wildcards (see below)
-    "pause_media": true,  // Pause media before performing action
-    "kwargs": {  // Keyword arguments to pass to the action, for example in Say, the kwargs are sent to the TTS engine
-      "rate": 175
-    }
-  }
-  ```
+- Run `configurator.exe` to edit the config.
+- Run `AntiProcrastinator.exe`!
 
   - **Available actions:**
-    - `actions.Sleep`
-    - `actions.Say`
-    - `actions.Exit`
-    - `actions.PlaySound`
-    - `actions.CloseWindow`
-    - `actions.Print`
+    - `Sleep`
+    - `Say`
+    - `Exit`
+    - `Playsound`
+    - `Closewindow`
+    - `Print`
 
   - **Wildcards:**
     - `{deadline}` -> `get_deadline()`

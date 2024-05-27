@@ -4,7 +4,7 @@ import win32gui
 from .action import Action
 
 
-class CloseWindow(Action):
+class Closewindow(Action):
     def __init__(self, condition_func: str = None):
         """
         Creates an action that closes the focused window.
@@ -19,7 +19,7 @@ class CloseWindow(Action):
         """
         import util
 
-        if self.raw_condition_func is not None:
+        if self.condition_func is not None:
             condition_func_str = util.functions.deconstruct_condition_function(self.raw_condition_func)
             condition_func = {
                 "function": condition_func_str[0],
@@ -29,7 +29,7 @@ class CloseWindow(Action):
         else:
             condition_func = None
 
-        return {"action": "CloseWindow", "condition_func": condition_func}
+        return {"action": "Closewindow", "condition_func": condition_func}
 
     async def execute(self):
         if not await super().execute():

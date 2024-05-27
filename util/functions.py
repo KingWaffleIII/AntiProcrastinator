@@ -9,6 +9,19 @@ from winsdk.windows.media.control import (
 from . import config
 
 
+def is_valid_datetime(date: str) -> bool:
+    """
+    Check if a string is a valid datetime.
+    :param date: a string representing a datetime.
+    :return: whether the string is a valid datetime.
+    """
+    try:
+        datetime.datetime.strptime(date, "%Y-%m-%d %H:%M:%S")
+        return True
+    except ValueError:
+        return False
+
+
 def get_time(t: int):
     """
     Get time in human-readable format.  e.g. 3600 -> 1 hour, 60 -> 1 minute, 1 -> 1 second
@@ -34,14 +47,15 @@ def get_raw_deadline():
     """
     config.load_config(config.config_path)
 
-    if isinstance(config.config["deadline"], str):
-        return datetime.datetime.strptime(config.config["deadline"], "%Y/%m/%d %H:%M:%S")
+    # deprecated
+    # if isinstance(config.config["deadlines"], str):
+    #     return datetime.datetime.strptime(config.config["deadlines"], "%Y/%m/%d %H:%M:%S")
 
     # list of deadlines
-    for i in config.config["deadline"]:
+    for i in config.config["deadlines"]:
         # check if datetime has passed
-        if datetime.datetime.strptime(i, "%Y/%m/%d %H:%M:%S") > datetime.datetime.today():
-            return datetime.datetime.strptime(i, "%Y/%m/%d %H:%M:%S")
+        if datetime.datetime.strptime(i, "%Y-%m-%d %H:%M:%S") > datetime.datetime.today():
+            return datetime.datetime.strptime(i, "%Y-%m-%d %H:%M:%S")
 
 
 def get_deadline_now_diff():
