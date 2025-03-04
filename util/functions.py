@@ -54,7 +54,10 @@ def get_raw_deadline():
     # list of deadlines
     for i in config.config["deadlines"]:
         # check if datetime has passed
-        if datetime.datetime.strptime(i, "%Y-%m-%d %H:%M:%S") > datetime.datetime.today():
+        if (
+            datetime.datetime.strptime(i, "%Y-%m-%d %H:%M:%S")
+            > datetime.datetime.today()
+        ):
             return datetime.datetime.strptime(i, "%Y-%m-%d %H:%M:%S")
 
 
@@ -80,17 +83,20 @@ def get_deadline():
     Get deadline in human-readable format.
     :return: the deadline in human-readable format.
     """
-    deadline = get_raw_deadline()
-    diff = deadline - datetime.datetime.today()
-    if diff.days > 1:
-        return f"There are only {diff.days} days left until your deadline. "
-    if diff.days == 1:
-        diff = int((diff - datetime.timedelta(days=1)).total_seconds() / 60 / 60)
-        return f"My brother in Christ, there are only {diff + 24} hours left until your deadline. "
-    t = get_time(int(diff.total_seconds()))
-    # if any(x in t for x in ["hour", "minute", "second"]):
-    #     return f"Bro you're cooked, there is only {t} left until your deadline. "
-    return f"Bro you're cooked, there are only {t} left until your deadline. "
+    try:
+        deadline = get_raw_deadline()
+        diff = deadline - datetime.datetime.today()
+        if diff.days > 1:
+            return f"There are only {diff.days} days left until your deadline. "
+        if diff.days == 1:
+            diff = int((diff - datetime.timedelta(days=1)).total_seconds() / 60 / 60)
+            return f"My brother in Christ, there are only {diff + 24} hours left until your deadline. "
+        t = get_time(int(diff.total_seconds()))
+        # if any(x in t for x in ["hour", "minute", "second"]):
+        #     return f"Bro you're cooked, there is only {t} left until your deadline. "
+        return f"Bro you're cooked, there are only {t} left until your deadline. "
+    except TypeError:  # no deadline
+        return "You have not configured a deadline but that doesn't mean you can slack off. "
 
 
 def get_insult():
@@ -99,7 +105,9 @@ def get_insult():
     :return: random insult.
     """
     config.load_config(config.config_path)
-    return config.config["insults"][random.randint(0, len(config.config["insults"]) - 1)]
+    return config.config["insults"][
+        random.randint(0, len(config.config["insults"]) - 1)
+    ]
 
 
 async def pause_media() -> bool:
@@ -110,8 +118,8 @@ async def pause_media() -> bool:
     sessions = await MediaManager.request_async()
     current_session = sessions.get_current_session()
     if (
-            current_session
-            and current_session.get_playback_info().controls.is_pause_enabled
+        current_session
+        and current_session.get_playback_info().controls.is_pause_enabled
     ):
         await current_session.try_pause_async()
         return True
@@ -126,6 +134,7 @@ async def play_media():
     sessions = await MediaManager.request_async()
     current_session = sessions.get_current_session()
     await current_session.try_play_async()
+
 
 timer = time.time()
 
@@ -187,8 +196,7 @@ def replace_wildcards(text: str) -> str:
     :return: text with wildcards replaced.
     """
     return (
-        text
-        .replace("{deadline}", get_deadline())
+        text.replace("{deadline}", get_deadline())
         .replace("{insult}", get_insult())
         .replace("{timer_diff}", get_timer_diff_in_text())
         .replace("{window}", window)
@@ -201,7 +209,9 @@ def eval_file_path(text: str) -> str:
     Evaluates {runtime_dir} in text.
     :return: the evaluated text.
     """
-    return text.replace("{runtime_dir}", os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    return text.replace(
+        "{runtime_dir}", os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    )
 
 
 def build_condition_function(function: str, inverse: bool, args: list) -> str:
@@ -213,7 +223,7 @@ def build_condition_function(function: str, inverse: bool, args: list) -> str:
     :return: a lambda function as a string.
     """
     if len(args) != 0:
-        args_str = ''.join([f'{arg},' for arg in args])[:-1]
+        args_str = "".join([f"{arg}," for arg in args])[:-1]
     else:
         args_str = ""
     if inverse:

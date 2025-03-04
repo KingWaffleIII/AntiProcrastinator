@@ -59,6 +59,7 @@ def create_config(path: str):
         config = {
             "deadlines": [(datetime.datetime.now() + datetime.timedelta(days=7)).strftime("%Y-%m-%d %H:%M:%S")],
             "blacklist": ["discord", "steam"],
+            "whitelist": [],
             "insults": [
                 "Do you want to work at McDonalds?"
             ],

@@ -18,23 +18,29 @@ def action_set_menu():
         action_sets = {
             "On Startup": util.config.config["on_startup"],
             "On Procrastination": util.config.config["on_procrastination"],
-            "After Procrastination": util.config.config["after_procrastination"]
+            "After Procrastination": util.config.config["after_procrastination"],
         }
 
-        choice = inquirer.select(message="Select an action set or another option:", choices=[
-            "On Startup",
-            "On Procrastination",
-            "After Procrastination",
-            "Deadlines",
-            "Blacklist",
-            "Insults",
-            "Reset to defaults",
-            "Exit"
-        ]).execute()
+        choice = inquirer.select(
+            message="Select an action set or another option:",
+            choices=[
+                "On Startup",
+                "On Procrastination",
+                "After Procrastination",
+                "Deadlines",
+                "Blacklist",
+                "Whitelist",
+                "Insults",
+                "Reset to defaults",
+                "Exit",
+            ],
+        ).execute()
 
         match choice:
             case "Reset to defaults":
-                confirm = inquirer.confirm(message="Are you sure you want to reset the config to defaults?").execute()
+                confirm = inquirer.confirm(
+                    message="Are you sure you want to reset the config to defaults?"
+                ).execute()
                 if confirm:
                     util.config.create_config("config.json")
                     print("Config reset! Please relaunch.")
@@ -51,6 +57,12 @@ def action_set_menu():
                     print(f"""{Colour.BOLD}{Colour.RED}{item}{Colour.END}""")
 
                 action_menu("blacklist", util.config.config["blacklist"])
+
+            case "Whitelist":
+                for item in util.config.config["whitelist"]:
+                    print(f"""{Colour.BOLD}{Colour.RED}{item}{Colour.END}""")
+
+                action_menu("whitelist", util.config.config["whitelist"])
 
             case "Insults":
                 for insult in util.config.config["insults"]:
@@ -84,27 +96,34 @@ def action_set_menu():
 def get_init_params(cls):
     init_signature = inspect.signature(cls.__init__)
     params = init_signature.parameters
-    return [name for name, param in params.items() if name not in ['self', 'condition_func']]
+    return [
+        name for name, param in params.items() if name not in ["self", "condition_func"]
+    ]
 
 
 def action_menu(category: str, *args):
     while True:
-        choice = inquirer.select(message="Select an option:", choices=[
-            "Add",
-            "Edit",
-            "Remove",
-            "Save",
-            "Back"
-        ]).execute()
+        choice = inquirer.select(
+            message="Select an option:",
+            choices=["Add", "Edit", "Remove", "Save", "Back"],
+        ).execute()
 
         match choice:
             case "Add":
                 if isinstance(args[0], Actionset):
-                    action_classes = [action for action in pkgutil.iter_modules(actions.__path__) if action.name not in ["action", "actionset", "defaults"]]
+                    action_classes = [
+                        action
+                        for action in pkgutil.iter_modules(actions.__path__)
+                        if action.name not in ["action", "actionset", "defaults"]
+                    ]
                     action_classes = [action.name for action in action_classes]
-                    choice = inquirer.select(message="Select an action to add:", choices=action_classes).execute()
+                    choice = inquirer.select(
+                        message="Select an action to add:", choices=action_classes
+                    ).execute()
                     module = importlib.import_module(f"actions.{choice}")
-                    raw_condition_func = inquirer.text(message="Enter the condition function (leave blank for none):").execute()
+                    raw_condition_func = inquirer.text(
+                        message="Enter the condition function (leave blank for none):"
+                    ).execute()
                     if raw_condition_func == "":
                         raw_condition_func = None
                     params = get_init_params(getattr(module, choice.capitalize()))
@@ -120,36 +139,73 @@ def action_menu(category: str, *args):
             case "Edit":
                 if isinstance(args[0], Actionset):
                     temp = args[0].to_json()
-                    choice = inquirer.select(message="Select an item to remove:", choices=[f"Action #{temp.index(action.to_json())+1}: {action.__class__.__name__}" for action in args[0].actions]).execute()
-                    index = int(choice.split(" ")[1].removeprefix("#").removesuffix(":"))-1
+                    choice = inquirer.select(
+                        message="Select an item to remove:",
+                        choices=[
+                            f"Action #{temp.index(action.to_json())+1}: {action.__class__.__name__}"
+                            for action in args[0].actions
+                        ],
+                    ).execute()
+                    index = (
+                        int(choice.split(" ")[1].removeprefix("#").removesuffix(":"))
+                        - 1
+                    )
                     action = args[0].actions[index]
-                    action.raw_condition_func = inquirer.text(message="Edit the condition function:", default=action.raw_condition_func if action.raw_condition_func is not None else "None").execute()
+                    action.raw_condition_func = inquirer.text(
+                        message="Edit the condition function:",
+                        default=(
+                            action.raw_condition_func
+                            if action.raw_condition_func is not None
+                            else "None"
+                        ),
+                    ).execute()
                     for k, v in action.to_json().items():
                         if k in ["action", "condition_func"]:
                             continue
                         if isinstance(v, bool):
-                            text = inquirer.select(message=f"Edit the {k}:", choices=["True", "False"]).execute()
+                            text = inquirer.select(
+                                message=f"Edit the {k}:", choices=["True", "False"]
+                            ).execute()
                             action.__setattr__(k, text == "True")
                         else:
-                            text = inquirer.text(message=f"Edit the {k}:", default=str(v)).execute()
+                            text = inquirer.text(
+                                message=f"Edit the {k}:", default=str(v)
+                            ).execute()
                             action.__setattr__(k, text)
                     args[0].actions[index] = action
                 else:
-                    choice = inquirer.select(message="Select an item to edit:", choices=args[0]).execute()
+                    choice = inquirer.select(
+                        message="Select an item to edit:", choices=args[0]
+                    ).execute()
                     index = args[0].index(choice)
-                    text = inquirer.text(message="Edit the item:", default=args[0][index]).execute()
+                    text = inquirer.text(
+                        message="Edit the item:", default=args[0][index]
+                    ).execute()
                     args[0][index] = text
             case "Remove":
                 if isinstance(args[0], Actionset):
                     temp = args[0].to_json()
-                    choice = inquirer.select(message="Select an item to remove:", choices=[f"Action #{temp.index(action.to_json())+1}: {action.__class__.__name__}" for action in args[0].actions]).execute()
-                    args[0].actions.pop(int(choice.split(" ")[1].removeprefix("#").removesuffix(":"))-1)
+                    choice = inquirer.select(
+                        message="Select an item to remove:",
+                        choices=[
+                            f"Action #{temp.index(action.to_json())+1}: {action.__class__.__name__}"
+                            for action in args[0].actions
+                        ],
+                    ).execute()
+                    args[0].actions.pop(
+                        int(choice.split(" ")[1].removeprefix("#").removesuffix(":"))
+                        - 1
+                    )
                 else:
-                    choice = inquirer.select(message="Select an item to remove:", choices=args[0]).execute()
+                    choice = inquirer.select(
+                        message="Select an item to remove:", choices=args[0]
+                    ).execute()
                     args[0].remove(choice)
             case "Save":
                 # todo validation
-                util.config.config[category] = args[0].to_json() if isinstance(args[0], Actionset) else args[0]
+                util.config.config[category] = (
+                    args[0].to_json() if isinstance(args[0], Actionset) else args[0]
+                )
                 util.config.save_config()
             case "Back":
                 return
@@ -182,4 +238,6 @@ try:
     util.config.backup_config()
     action_set_menu()
 except json.JSONDecodeError:
-    print("Config file is invalid. Delete the file to regenerate a new one or fix the error.")
+    print(
+        "Config file is invalid. Delete the file to regenerate a new one or fix the error."
+    )

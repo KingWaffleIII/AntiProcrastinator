@@ -12,34 +12,34 @@ import util
 
 if not util.config.config_exists("config.json"):
     print("Config file not found. Please run the configurator first.")
-    sys.exit(1)
+    sys.exit(-1)
 
 try:
     util.config.load_config("config.json")
 except json.JSONDecodeError:
     print("Config file is invalid. Please run the configurator.")
-    sys.exit(1)
+    sys.exit(-1)
 
 
 # Freeze support for multiprocessing when using PyInstaller.
 class _Popen(forking.Popen):
     def __init__(self, *args, **kw):
-        if hasattr(sys, 'frozen'):
+        if hasattr(sys, "frozen"):
             # We have to set original _MEIPASS2 value from sys._MEIPASS
             # to get --onefile mode working.
-            os.putenv('_MEIPASS2', sys._MEIPASS)
+            os.putenv("_MEIPASS2", sys._MEIPASS)
         try:
             super(_Popen, self).__init__(*args, **kw)
         finally:
-            if hasattr(sys, 'frozen'):
+            if hasattr(sys, "frozen"):
                 # On some platforms (e.g. AIX) 'os.unsetenv()' is not
                 # available. In those cases we cannot delete the variable
                 # but only set it to the empty string. The bootloader
                 # can handle this case.
-                if hasattr(os, 'unsetenv'):
-                    os.unsetenv('_MEIPASS2')
+                if hasattr(os, "unsetenv"):
+                    os.unsetenv("_MEIPASS2")
                 else:
-                    os.putenv('_MEIPASS2', '')
+                    os.putenv("_MEIPASS2", "")
 
 
 OnStartupActionSet = actions.Actionset()
@@ -69,7 +69,7 @@ async def watch():
     while True:
         window = win32gui.GetWindowText(win32gui.GetForegroundWindow())
         if window != "" and any(
-            x in window.lower() for x in util.config.config["blacklist"]
+            x in window.lower() and x not in util.config.config["whitelist"] for x in util.config.config["blacklist"]
         ):
             if proc is None or not proc.is_alive():
                 util.functions.start_timer()
