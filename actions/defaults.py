@@ -1,6 +1,3 @@
-import os
-
-import util
 import actions
 
 # Available actions:

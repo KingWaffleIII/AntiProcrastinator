@@ -283,7 +283,7 @@ icon = pystray.Icon(
         ),
         pystray.MenuItem(
             "Exit",
-            lambda: os._exit(0),
+            lambda icon: (icon.stop(), os._exit(0)),
         ),
     ),
 )
