@@ -101,5 +101,19 @@ def run():
 
 if __name__ == "__main__":
     multiprocessing.freeze_support()
-    threading.Thread(target=run).start()
-    util.functions.icon.run()
+
+    def run_with_watchdog():
+        try:
+            run()
+        except asyncio.CancelledError:
+            pass
+
+    run_thread = threading.Thread(target=run_with_watchdog, daemon=True)
+    run_thread.start()
+
+    try:
+        util.functions.icon.run()
+    finally:
+        if run_thread.is_alive():
+            asyncio.get_event_loop().stop()
+            run_thread.join()
