@@ -3,16 +3,20 @@ import json
 import multiprocessing
 import multiprocessing.popen_spawn_win32 as forking
 import os
-import time
 import sys
+import threading
+import time
+
 import win32gui
 
 import actions
 import util
 
 if not util.config.config_exists("config.json"):
-    print("Config file not found. Please run the configurator first.")
-    sys.exit(-1)
+    # print("Config file not found. Please run the configurator first.")
+    # sys.exit(-1)
+    util.config.create_config("config.json")
+    print("Config file created!")
 
 try:
     util.config.load_config("config.json")
@@ -68,8 +72,10 @@ async def watch():
     proc = None
     while True:
         window = win32gui.GetWindowText(win32gui.GetForegroundWindow())
-        if window != "" and any(
-            x in window.lower() and x not in util.config.config["whitelist"] for x in util.config.config["blacklist"]
+        if (
+            window
+            and any(x in window.lower() for x in util.config.config["blacklist"])
+            and not any(x in window.lower() for x in util.config.config["whitelist"])
         ):
             if proc is None or not proc.is_alive():
                 util.functions.start_timer()
@@ -88,7 +94,12 @@ async def watch():
         time.sleep(1)
 
 
-if __name__ == "__main__":
-    multiprocessing.freeze_support()
+def run():
     asyncio.run(startup())
     asyncio.run(watch())
+
+
+if __name__ == "__main__":
+    multiprocessing.freeze_support()
+    threading.Thread(target=run).start()
+    util.functions.icon.run()

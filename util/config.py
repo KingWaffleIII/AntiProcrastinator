@@ -1,7 +1,7 @@
 import datetime
 import json
 
-config_path = 'config.json'
+config_path = "config.json"
 config = {}
 
 
@@ -23,7 +23,7 @@ def backup_config():
     """
     Backs up the config to another config file.
     """
-    with open(config_path + '.bak', 'w') as f:
+    with open(config_path + ".bak", "w") as f:
         json.dump(config, f, indent=4)
 
 
@@ -31,7 +31,7 @@ def save_config():
     """
     Save the config to the config file.
     """
-    with open(config_path, 'w') as f:
+    with open(config_path, "w") as f:
         json.dump(config, f, indent=4)
 
 
@@ -53,18 +53,21 @@ def create_config(path: str):
     Create a config file at the given path.
     :param path: a string representing the path to the config file.
     """
-    with open(path, 'w+') as f:
+    with open(path, "w+") as f:
         from actions import defaults
 
         config = {
-            "deadlines": [(datetime.datetime.now() + datetime.timedelta(days=7)).strftime("%Y-%m-%d %H:%M:%S")],
+            "deadlines": [
+                (datetime.datetime.now() + datetime.timedelta(days=7)).strftime(
+                    "%Y-%m-%d %H:%M:%S"
+                )
+            ],
             "blacklist": ["discord", "steam"],
             "whitelist": [],
-            "insults": [
-                "Do you want to work at McDonalds?"
-            ],
+            "insults": ["Do you want to work at McDonalds?"],
             "on_startup": defaults.OnStartupActionSet.to_json(),
             "on_procrastination": defaults.OnProcrastinationActionSet.to_json(),
             "after_procrastination": defaults.AfterProcrastinationActionSet.to_json(),
+            "break": defaults.BreakActionSet.to_json(),
         }
         json.dump(config, f, indent=4)

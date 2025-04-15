@@ -19,6 +19,7 @@ def action_set_menu():
             "On Startup": util.config.config["on_startup"],
             "On Procrastination": util.config.config["on_procrastination"],
             "After Procrastination": util.config.config["after_procrastination"],
+            "Break": util.config.config["break"],
         }
 
         choice = inquirer.select(
@@ -27,6 +28,7 @@ def action_set_menu():
                 "On Startup",
                 "On Procrastination",
                 "After Procrastination",
+                "Break",
                 "Deadlines",
                 "Blacklist",
                 "Whitelist",

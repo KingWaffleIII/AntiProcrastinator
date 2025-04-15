@@ -5,3 +5,5 @@ winsdk
 playsound==1.2.2
 pyinstaller
 inquirerpy
+pystray
+pillow
