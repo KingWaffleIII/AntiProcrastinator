@@ -1,10 +1,10 @@
 # -*- mode: python ; coding: utf-8 -*-
 
 main = Analysis(
-    ['main.py'],
+    ["main.py"],
     pathex=[],
     binaries=[],
-    datas=[('annoying.mp3', '.')],
+    datas=[("annoying.mp3", "."), ("icon.png", "."), ("icon2.png", ".")],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},
@@ -19,14 +19,14 @@ main_exe = EXE(
     main.binaries,
     main.datas,
     [],
-    name='AntiProcrastinator',
+    name="AntiProcrastinator",
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
     upx=True,
     upx_exclude=[],
     runtime_tmpdir=None,
-    console=True,
+    console=False,
     disable_windowed_traceback=False,
     argv_emulation=False,
     target_arch=None,
@@ -35,9 +35,9 @@ main_exe = EXE(
 )
 
 configurator = Analysis(
-    ['configurator.py'],
+    ["configurator.py"],
     pathex=[],
-    binaries=[],
+    binaries=[("icon.png", "."), ("icon2.png", ".")],
     datas=[],
     hiddenimports=[],
     hookspath=[],
@@ -53,7 +53,7 @@ configurator_exe = EXE(
     configurator.binaries,
     configurator.datas,
     [],
-    name='Configurator',
+    name="Configurator",
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,

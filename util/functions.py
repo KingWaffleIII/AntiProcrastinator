@@ -1,7 +1,12 @@
+import asyncio
 import datetime
-import random
-import time
 import os
+import random
+import sys
+import time
+
+import pystray
+from PIL import Image
 from winsdk.windows.media.control import (
     GlobalSystemMediaTransportControlsSessionManager as MediaManager,
 )
@@ -245,3 +250,40 @@ def deconstruct_condition_function(condition_func: str) -> tuple[str, bool, list
     if args == [""]:
         args = []
     return function, inverse, args
+
+
+def run_configurator():
+    if not hasattr(sys, "frozen"):
+        os.system('start cmd /k "python configurator.py"')
+    else:
+        # run configutator.exe
+        os.system("configurator.exe")
+
+
+def take_break():
+    from actions import Actionset
+
+    BreakActionSet = Actionset()
+    BreakActionSet.load_json(config.config["break"])
+    asyncio.get_event_loop().run_until_complete(BreakActionSet.execute())
+
+
+icon = pystray.Icon(
+    "AntiProcrastinator",
+    Image.open(eval_file_path(r"{runtime_dir}\icon2.png")),
+    title="AntiProcrastinator",
+    menu=pystray.Menu(
+        pystray.MenuItem(
+            "Open Configurator",
+            run_configurator,
+        ),
+        pystray.MenuItem(
+            "Break",
+            take_break,
+        ),
+        pystray.MenuItem(
+            "Exit",
+            lambda: os._exit(0),
+        ),
+    ),
+)
