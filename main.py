@@ -4,7 +4,6 @@ import multiprocessing
 import multiprocessing.popen_spawn_win32 as forking
 import os
 import sys
-import threading
 import time
 
 import win32gui
@@ -68,9 +67,12 @@ def procrastination():
         asyncio.run(OnProcrastinationActionSet.execute())
 
 
-async def watch():
+async def watch(break_event: multiprocessing.Event):
     proc = None
     while True:
+        if break_event.is_set():
+            raise asyncio.CancelledError
+
         window = win32gui.GetWindowText(win32gui.GetForegroundWindow())
         if (
             window
@@ -89,31 +91,33 @@ async def watch():
 
                 await AfterProcrastinationActionSet.execute()
 
-                time.sleep(60)
+                time.sleep(1)
 
         time.sleep(1)
 
 
-def run():
-    asyncio.run(startup())
-    asyncio.run(watch())
+def run_watchdog(break_event: multiprocessing.Event):
+    while True:
+        if not break_event.is_set():
+            try:
+                asyncio.run(watch(break_event))
+            except asyncio.CancelledError:
+                continue
+        else:
+            time.sleep(1)
 
 
 if __name__ == "__main__":
     multiprocessing.freeze_support()
 
-    def run_with_watchdog():
-        try:
-            run()
-        except asyncio.CancelledError:
-            pass
+    asyncio.run(startup())
 
-    run_thread = threading.Thread(target=run_with_watchdog, daemon=True)
-    run_thread.start()
+    watchdog = Process(target=run_watchdog, args=(util.break_event,), name="watchdog")
+    watchdog.start()
 
     try:
-        util.functions.icon.run()
+        util.icon.run()
     finally:
-        if run_thread.is_alive():
-            asyncio.get_event_loop().stop()
-            run_thread.join()
+        if watchdog.is_alive():
+            # asyncio.get_event_loop().stop()
+            watchdog.kill()
