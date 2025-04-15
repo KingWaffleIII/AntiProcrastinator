@@ -81,7 +81,7 @@ BreakActionSet = actions.Actionset(
         ),
         actions.Sleep(600),
         actions.Say(
-            text="Break's over! Get back to work, those As aren't gonna earn themselves.",
+            text="Break's over! Get back to work, those A's aren't gonna earn themselves.",
             pause_media=True,
             condition_func=None,
         ),

@@ -1,4 +1,4 @@
-from util.functions import icon
+from util import icon
 
 from .action import Action
 
