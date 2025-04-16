@@ -67,10 +67,17 @@ def procrastination():
         asyncio.run(OnProcrastinationActionSet.execute())
 
 
-async def watch(break_event: multiprocessing.Event):
-    proc = None
+procrastination_proc: multiprocessing.Process | None = None
+
+
+async def watch(break_event):
+    global procrastination_proc
+
     while True:
         if break_event.is_set():
+            if procrastination_proc is not None and procrastination_proc.is_alive():
+                procrastination_proc.kill()
+                procrastination_proc = None
             raise asyncio.CancelledError
 
         window = win32gui.GetWindowText(win32gui.GetForegroundWindow())
@@ -79,15 +86,17 @@ async def watch(break_event: multiprocessing.Event):
             and any(x in window.lower() for x in util.config.config["blacklist"])
             and not any(x in window.lower() for x in util.config.config["whitelist"])
         ):
-            if proc is None or not proc.is_alive():
+            if procrastination_proc is None or not procrastination_proc.is_alive():
                 util.functions.start_timer()
                 util.functions.set_window(window)
-                proc = Process(target=procrastination)
-                proc.start()
+                procrastination_proc = Process(
+                    target=procrastination, name="procrastination"
+                )
+                procrastination_proc.start()
         else:
-            if proc is not None and proc.is_alive():
-                proc.kill()
-                proc = None
+            if procrastination_proc is not None and procrastination_proc.is_alive():
+                procrastination_proc.kill()
+                procrastination_proc = None
 
                 await AfterProcrastinationActionSet.execute()
 
@@ -96,7 +105,7 @@ async def watch(break_event: multiprocessing.Event):
         time.sleep(1)
 
 
-def run_watchdog(break_event: multiprocessing.Event):
+def run_watchdog(break_event):
     while True:
         if not break_event.is_set():
             try:
