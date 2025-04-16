@@ -91,7 +91,7 @@ async def watch(break_event: multiprocessing.Event):
 
                 await AfterProcrastinationActionSet.execute()
 
-                time.sleep(1)
+                time.sleep(60)
 
         time.sleep(1)
 
@@ -119,5 +119,4 @@ if __name__ == "__main__":
         util.icon.run()
     finally:
         if watchdog.is_alive():
-            # asyncio.get_event_loop().stop()
             watchdog.kill()
