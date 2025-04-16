@@ -36,6 +36,7 @@ break_event = multiprocessing.Event()
 
 def take_break():
     break_event.set()
+    icon.update_menu()
 
     from actions import Actionset
 
@@ -45,6 +46,7 @@ def take_break():
     def run_break():
         asyncio.run(BreakActionSet.execute())
         break_event.clear()
+        icon.update_menu()
 
     threading.Thread(target=run_break, daemon=True).start()
 
@@ -61,10 +63,11 @@ icon = pystray.Icon(
         pystray.MenuItem(
             "Break",
             take_break,
+            enabled=lambda icon: not break_event.is_set(),
         ),
         pystray.MenuItem(
             "Exit",
-            lambda icon: (icon.stop(), os._exit(0)),
+            lambda icon: icon.stop(),
         ),
     ),
 )
