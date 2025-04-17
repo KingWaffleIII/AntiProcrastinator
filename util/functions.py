@@ -1,12 +1,8 @@
-import asyncio
 import datetime
 import os
 import random
-import sys
 import time
 
-import pystray
-from PIL import Image
 from winsdk.windows.media.control import (
     GlobalSystemMediaTransportControlsSessionManager as MediaManager,
 )
