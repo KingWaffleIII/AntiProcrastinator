@@ -1,4 +1,4 @@
-from util import icon
+from util import functions
 
 from .action import Action
 
@@ -19,10 +19,9 @@ class Notify(Action):
         Converts the action to JSON.
         :return: JSON representation of the action.
         """
-        import util
 
         if self.condition_func is not None:
-            condition_func_str = util.functions.deconstruct_condition_function(
+            condition_func_str = functions.deconstruct_condition_function(
                 self.raw_condition_func
             )
             condition_func = {
@@ -38,7 +37,8 @@ class Notify(Action):
         if not await super().execute():
             return False
 
-        import util
+        text = functions.replace_wildcards(self.text)
 
-        text = util.functions.replace_wildcards(self.text)
-        icon.notify(text)
+        functions.show_notif(text)
+
+        return True

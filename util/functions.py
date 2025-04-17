@@ -250,3 +250,29 @@ def deconstruct_condition_function(condition_func: str) -> tuple[str, bool, list
     if args == [""]:
         args = []
     return function, inverse, args
+
+
+_process_notif_conn = None
+
+
+def set_notification_pipe(conn):
+    """
+    Set the notification pipe connection for this process.
+    """
+    global _process_notif_conn
+    _process_notif_conn = conn
+
+
+def show_notif(notif: str) -> None:
+    """
+    Shows a notification via the tray icon.
+    :param notif: the notification to show.
+    """
+    # Use the process-specific connection if available
+    if _process_notif_conn is not None:
+        try:
+            _process_notif_conn.send(notif)
+            print(f"Process {os.getpid()} sent notification: {notif}")
+            return
+        except Exception as e:
+            print(f"Failed to send notification via process pipe: {e}")

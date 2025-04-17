@@ -4,7 +4,7 @@ main = Analysis(
     ["main.py"],
     pathex=[],
     binaries=[],
-    datas=[("annoying.mp3", "."), ("icon.png", "."), ("icon2.png", ".")],
+    datas=[("annoying.mp3", "."), ("icon.png", ".")],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},
@@ -32,13 +32,14 @@ main_exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
+    icon="./icon.ico",
 )
 
 configurator = Analysis(
     ["configurator.py"],
     pathex=[],
-    binaries=[("icon.png", "."), ("icon2.png", ".")],
-    datas=[],
+    binaries=[],
+    datas=[("icon.png", ".")],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},
@@ -66,4 +67,5 @@ configurator_exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
+    icon="./icon.ico",
 )
