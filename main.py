@@ -4,6 +4,7 @@ import multiprocessing
 import multiprocessing.popen_spawn_win32 as forking
 import os
 import sys
+import threading
 import time
 
 import win32gui
@@ -62,16 +63,14 @@ async def startup():
     await OnStartupActionSet.execute()
 
 
-def procrastination():
+def procrastination(notif_conn):
+    util.functions.set_notification_pipe(notif_conn)
     while True:
         asyncio.run(OnProcrastinationActionSet.execute())
 
 
-procrastination_proc: multiprocessing.Process | None = None
-
-
 async def watch(break_event):
-    global procrastination_proc
+    procrastination_proc: multiprocessing.Process | None = None
 
     while True:
         if break_event.is_set():
@@ -90,7 +89,9 @@ async def watch(break_event):
                 util.functions.start_timer()
                 util.functions.set_window(window)
                 procrastination_proc = Process(
-                    target=procrastination, name="procrastination"
+                    target=procrastination,
+                    args=(util.notif_send_conn,),
+                    name="procrastination",
                 )
                 procrastination_proc.start()
         else:
@@ -105,7 +106,8 @@ async def watch(break_event):
         time.sleep(1)
 
 
-def run_watchdog(break_event):
+def run_watchdog(break_event, notif_conn):
+    util.functions.set_notification_pipe(notif_conn)
     while True:
         if not break_event.is_set():
             try:
@@ -121,8 +123,17 @@ if __name__ == "__main__":
 
     asyncio.run(startup())
 
-    watchdog = Process(target=run_watchdog, args=(util.break_event,), name="watchdog")
+    watchdog = Process(
+        target=run_watchdog,
+        args=(util.break_event, util.notif_send_conn),
+        name="watchdog",
+    )
     watchdog.start()
+
+    util.functions.set_notification_pipe(util.notif_send_conn)
+
+    notifs = threading.Thread(target=util.notify_worker, daemon=True, name="notifs")
+    notifs.start()
 
     try:
         util.icon.run()

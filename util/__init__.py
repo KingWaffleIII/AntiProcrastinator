@@ -3,6 +3,7 @@ import multiprocessing
 import os
 import sys
 import threading
+import time
 
 import pystray
 from PIL import Image
@@ -51,9 +52,38 @@ def take_break():
     threading.Thread(target=run_break, daemon=True).start()
 
 
+notif_recv_conn, notif_send_conn = multiprocessing.Pipe()
+
+
+def notify_worker():
+    while True:
+        try:
+            if notif_recv_conn.poll(0.1):
+                notif = notif_recv_conn.recv()
+                print(f"Got notification: {notif}")
+
+                # Try using pystray notification
+                if hasattr(icon, "_thread") and getattr(icon, "visible", False):
+                    try:
+                        print("Trying to notify with pystray...")
+                        icon.notify(notif)
+                        print("Notification sent with pystray")
+                        continue  # Skip to next notification if successful
+                    except Exception as e:
+                        print(f"Pystray notification failed: {e}")
+                else:
+                    print("Icon not ready for notification")
+            else:
+                time.sleep(0.5)
+
+        except Exception as e:
+            print(f"Notification worker error: {e}")
+            time.sleep(1)
+
+
 icon = pystray.Icon(
     "AntiProcrastinator",
-    Image.open(functions.eval_file_path(r"{runtime_dir}\icon2.png")),
+    Image.open(functions.eval_file_path(r"{runtime_dir}\icon.png")),
     title="AntiProcrastinator",
     menu=pystray.Menu(
         pystray.MenuItem(
