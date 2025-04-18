@@ -1,0 +1,45 @@
+{% extends "base.html" %} {% block content %}
+<h3>Actions</h3>
+<h4>Pick an action set:</h4>
+
+<nav class="navbar navbar-dark bg-dark">
+	<div class="container-fluid">
+		<div class="" id="navbarSupportedContent">
+			<ul class="navbar-nav me-auto mb-2 mb-lg-0">
+				<li class="nav-item">
+					<a
+						class="nav-link active"
+						aria-current="page"
+						href="/actions/on_startup"
+						>Startup</a
+					>
+				</li>
+				<li class="nav-item">
+					<a
+						class="nav-link active"
+						aria-current="page"
+						href="/actions/on_procrastination"
+						>On Procrastination</a
+					>
+				</li>
+				<li class="nav-item">
+					<a
+						class="nav-link active"
+						aria-current="page"
+						href="/actions/after_procrastination"
+						>After Procrastination</a
+					>
+				</li>
+				<li class="nav-item">
+					<a
+						class="nav-link active"
+						aria-current="page"
+						href="/actions/break"
+						>Break</a
+					>
+				</li>
+			</ul>
+		</div>
+	</div>
+</nav>
+{% endblock %}

@@ -1,0 +1,48 @@
+{% extends "base.html" %} {% block content %}
+<h3>Whitelist</h3>
+
+<p>
+	These are a list of case-insensitive strings that will be exempt from the
+	blacklist. E.g. if you have "youtube" blacklisted but you have "maths"
+	whitelisted then YouTube videos with "maths" in the title will be ignored.
+</p>
+
+<h4>Click to remove:</h4>
+
+<ol class="list-group">
+	{% for item in whitelist %}
+	<a
+		class="list-group-item list-group-item-danger list-group-item-action d-flex justify-content-between align-items-start"
+		href="/whitelist/remove/{{ whitelist.index(item) }}"
+	>
+		<div class="ms-2 me-auto">
+			<div class="fw-bold">{{ item }}</div>
+		</div>
+	</a>
+	{% endfor %} {% if whitelist|length == 0 %}
+	<h4 class="text-center">No items in the whitelist.</h4>
+	{% endif %}
+</ol>
+
+<br />
+
+<h4>Add a new item:</h4>
+<div class="input-group mb-3">
+	<input
+		type="text"
+		class="form-control"
+		placeholder="maths"
+		aria-label="Wlacklist"
+		aria-describedby="button-add"
+	/>
+	<button
+		class="btn btn-outline-success"
+		type="button"
+		id="button-add"
+		onclick="window.location.href='/whitelist/add?item=' + encodeURIComponent(document.querySelector('input').value)"
+	>
+		Add
+	</button>
+</div>
+
+{% endblock %}
