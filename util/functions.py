@@ -266,9 +266,4 @@ def show_notif(notif: str) -> None:
     """
     # Use the process-specific connection if available
     if _process_notif_conn is not None:
-        try:
-            _process_notif_conn.send(notif)
-            print(f"Process {os.getpid()} sent notification: {notif}")
-            return
-        except Exception as e:
-            print(f"Failed to send notification via process pipe: {e}")
+        _process_notif_conn.send(notif)

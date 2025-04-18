@@ -4,7 +4,12 @@ from .action import Action
 
 
 class Playsound(Action):
-    def __init__(self, file_path: str, condition_func: str = None):
+    def __init__(
+        self,
+        file_path: str,
+        pause_media=True,
+        condition_func: str = None,
+    ):
         """
         Creates an action that plays a sound file.
         Note: if using Pyinstaller, add the sound file to AntiProcrastinator.spec.
@@ -14,6 +19,7 @@ class Playsound(Action):
         super().__init__(condition_func)
 
         self.file_path = file_path
+        self.pause_media = pause_media
 
     def to_json(self):
         """
@@ -23,15 +29,22 @@ class Playsound(Action):
         import util
 
         if self.condition_func is not None:
-            condition_func_str = util.functions.deconstruct_condition_function(self.raw_condition_func)
+            condition_func_str = util.functions.deconstruct_condition_function(
+                self.raw_condition_func
+            )
             condition_func = {
                 "function": condition_func_str[0],
                 "inverse": condition_func_str[1],
-                "args": condition_func_str[2]
+                "args": condition_func_str[2],
             }
         else:
             condition_func = None
-        return {"action": "Playsound", "condition_func": condition_func, "file_path": self.file_path}
+        return {
+            "action": "Playsound",
+            "condition_func": condition_func,
+            "file_path": self.file_path,
+            "pause_media": self.pause_media,
+        }
 
     async def execute(self):
         if not await super().execute():
@@ -39,6 +52,7 @@ class Playsound(Action):
 
         import util
 
-        await util.functions.pause_media()
+        if self.pause_media:
+            await util.functions.pause_media()
 
         playsound.playsound(util.functions.eval_file_path(self.file_path))

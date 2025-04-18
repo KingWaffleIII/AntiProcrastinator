@@ -54,6 +54,7 @@ OnProcrastinationActionSet = actions.Actionset(
         ),
         actions.Playsound(
             file_path=r"{runtime_dir}\annoying.mp3",
+            pause_media=True,
         ),
     ]
 )
