@@ -60,24 +60,13 @@ def notify_worker():
         try:
             if notif_recv_conn.poll(0.1):
                 notif = notif_recv_conn.recv()
-                print(f"Got notification: {notif}")
 
-                # Try using pystray notification
                 if hasattr(icon, "_thread") and getattr(icon, "visible", False):
-                    try:
-                        print("Trying to notify with pystray...")
-                        icon.notify(notif)
-                        print("Notification sent with pystray")
-                        continue  # Skip to next notification if successful
-                    except Exception as e:
-                        print(f"Pystray notification failed: {e}")
-                else:
-                    print("Icon not ready for notification")
+                    icon.notify(notif)
+                    continue  # Skip to next notification if successful
             else:
                 time.sleep(0.5)
-
-        except Exception as e:
-            print(f"Notification worker error: {e}")
+        except Exception:
             time.sleep(1)
 
 
@@ -93,7 +82,7 @@ icon = pystray.Icon(
         pystray.MenuItem(
             "Break",
             take_break,
-            enabled=lambda icon: not break_event.is_set(),
+            enabled=lambda _icon: not break_event.is_set(),
         ),
         pystray.MenuItem(
             "Exit",

@@ -48,4 +48,4 @@ Enable this if you use Task Scheduler else TTS will not work:
 
 You can run the Python script from cloning or the executable from releases, **but make sure to have `config.json` in the same directory**.
 
-Note: when using `actions.PlaySound`, remember to add the sound files to `AntiProcrastinator.spec` if using Pyinstaller.
+Note: when using `actions.PlaySound`, remember to add the sound files to the `data` directory.

@@ -7,3 +7,5 @@ pyinstaller
 inquirerpy
 pystray
 pillow
+flask
+waitress
