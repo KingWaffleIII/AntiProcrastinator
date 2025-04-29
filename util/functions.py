@@ -100,6 +100,17 @@ def get_deadline():
         return "You have not configured a deadline but that doesn't mean you can slack off. "
 
 
+def get_pure_deadline():
+    """
+    Get only the deadline in human-readable format.
+    :return: the deadline in human-readable format.
+    """
+    try:
+        return get_time(get_deadline_now_diff())
+    except Exception:  # no deadline
+        return "You have not configured a deadline but that doesn't mean you can slack off. "
+
+
 def get_insult():
     """
     Get random insult from config.
@@ -189,6 +200,7 @@ def replace_wildcards(text: str) -> str:
     """
     Replace custom wildcards in text.
     {deadline} -> get_deadline()
+    {pure_deadline} -> get_pure_deadline()
     {insult} -> get_insult()
     {timer_diff} -> get_timer_diff_in_text()
     {window} -> window
@@ -198,6 +210,7 @@ def replace_wildcards(text: str) -> str:
     """
     return (
         text.replace("{deadline}", get_deadline())
+        .replace("{pure_deadline}", get_pure_deadline())
         .replace("{insult}", get_insult())
         .replace("{timer_diff}", get_timer_diff_in_text())
         .replace("{window}", window)
