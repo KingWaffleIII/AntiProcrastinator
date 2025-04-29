@@ -3,7 +3,7 @@ import threading
 import webbrowser
 import copy
 
-from flask import Flask, jsonify, redirect, render_template, request
+from flask import Flask, redirect, render_template, request
 from waitress import serve
 
 import util

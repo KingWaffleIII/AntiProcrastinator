@@ -69,7 +69,7 @@ def procrastination(notif_conn):
         asyncio.run(OnProcrastinationActionSet.execute())
 
 
-async def watch(break_event):
+async def watch(break_event, notif_conn):
     procrastination_proc: multiprocessing.Process | None = None
 
     while True:
@@ -90,7 +90,7 @@ async def watch(break_event):
                 util.functions.set_window(window)
                 procrastination_proc = Process(
                     target=procrastination,
-                    args=(util.notif_send_conn,),
+                    args=(notif_conn,),
                     name="procrastination",
                 )
                 procrastination_proc.start()
@@ -111,11 +111,21 @@ def run_watchdog(break_event, notif_conn):
     while True:
         if not break_event.is_set():
             try:
-                asyncio.run(watch(break_event))
+                asyncio.run(watch(break_event, notif_conn))
             except asyncio.CancelledError:
                 continue
         else:
             time.sleep(1)
+
+
+def water():
+    action = actions.Say(
+        "Ben-chodt, drink water!",
+        pause_media=False,
+    )
+    while True:
+        time.sleep(20 * 60)
+        asyncio.run(action.execute())
 
 
 if __name__ == "__main__":
@@ -134,6 +144,9 @@ if __name__ == "__main__":
 
     notifs = threading.Thread(target=util.notify_worker, daemon=True, name="notifs")
     notifs.start()
+
+    water_thread = threading.Thread(target=water, daemon=True, name="water_thread")
+    water_thread.start()
 
     try:
         util.icon.run()
