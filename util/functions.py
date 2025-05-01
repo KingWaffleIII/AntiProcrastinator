@@ -25,20 +25,33 @@ def is_valid_datetime(date: str) -> bool:
 
 def get_time(t: int):
     """
-    Get time in human-readable format.  e.g. 3600 -> 1 hour, 60 -> 1 minute, 1 -> 1 second
+    Get time in human-readable format. e.g. 86400 -> 1 day, 3600 -> 1 hour, 60 -> 1 minute
     :param t: total time in seconds.
     :return: string of human-readable time.
     """
-    if t % 60 == 0:
-        if t > 3600:
-            return f"{t // 3600} hour{'s' if t // 3600 > 1 else ''}"
-        if t > 60:
-            return f"{t // 60} minute{'s' if t // 60 > 1 else ''}"
-    if t > 3600:
-        return f"{t // 3600} hour{'s' if t // 3600 > 1 else ''}, {t % 3600 // 60} minute{'s' if t % 3600 // 60 > 1 else ''} and {t % 3600 % 60} second{'s' if t % 3600 % 60 > 1 else ''}"
-    if t > 60:
-        return f"{t // 60} minute{'s' if t // 60 > 1 else ''} and {t % 60} second{'s' if t % 60 > 1 else ''}"
-    return f"{t} second{'s' if t > 1 or t == 0 else ''}"
+    days = t // (24 * 3600)
+    t = t % (24 * 3600)
+    hours = t // 3600
+    t = t % 3600
+    minutes = t // 60
+    seconds = t % 60
+
+    parts = []
+    if days > 0:
+        parts.append(f"{days} day{'s' if days > 1 else ''}")
+    if hours > 0:
+        parts.append(f"{hours} hour{'s' if hours > 1 else ''}")
+    if minutes > 0:
+        parts.append(f"{minutes} minute{'s' if minutes > 1 else ''}")
+    if seconds > 0 or (days == 0 and hours == 0 and minutes == 0):
+        parts.append(f"{seconds} second{'s' if seconds > 1 or seconds == 0 else ''}")
+
+    if len(parts) == 1:
+        return parts[0]
+    elif len(parts) == 2:
+        return f"{parts[0]} and {parts[1]}"
+    else:
+        return ", ".join(parts[:-1]) + f" and {parts[-1]}"
 
 
 def get_raw_deadline():

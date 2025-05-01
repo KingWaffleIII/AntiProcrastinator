@@ -118,16 +118,6 @@ def run_watchdog(break_event, notif_conn):
             time.sleep(1)
 
 
-def water():
-    action = actions.Say(
-        "Ben-chodt, drink water!",
-        pause_media=False,
-    )
-    while True:
-        time.sleep(20 * 60)
-        asyncio.run(action.execute())
-
-
 if __name__ == "__main__":
     multiprocessing.freeze_support()
 
@@ -144,9 +134,6 @@ if __name__ == "__main__":
 
     notifs = threading.Thread(target=util.notify_worker, daemon=True, name="notifs")
     notifs.start()
-
-    water_thread = threading.Thread(target=water, daemon=True, name="water_thread")
-    water_thread.start()
 
     try:
         util.icon.run()
