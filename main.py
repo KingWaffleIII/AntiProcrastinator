@@ -8,6 +8,7 @@ import threading
 import time
 
 import win32gui
+import win32api
 
 import actions
 import util
@@ -79,20 +80,19 @@ async def watch(break_event, notif_conn):
                 procrastination_proc = None
             raise asyncio.CancelledError
 
-        # window = win32gui.GetWindowText(win32gui.GetForegroundWindow())
         windows = []
 
         def enumHandler(hwnd, _data):
-            if win32gui.IsWindowVisible(hwnd) and not win32gui.IsIconic(hwnd):
+            screen_width = win32api.GetSystemMetrics(0)
+            screen_height = win32api.GetSystemMetrics(1)
+            screen_rect = (0, 0, screen_width, screen_height)
+            if util.functions.is_window_visible(hwnd, screen_rect):
                 windows.append(win32gui.GetWindowText(hwnd))
 
         win32gui.EnumWindows(enumHandler, 0)
 
-        # if (
-        #     window
-        #     and any(x in window.lower() for x in util.config.config["blacklist"])
-        #     and not any(x in window.lower() for x in util.config.config["whitelist"])
-        # ):
+        print(windows)
+
         if any(
             (
                 window

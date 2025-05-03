@@ -2,6 +2,8 @@ import datetime
 import os
 import random
 import time
+import win32gui
+import win32con
 
 from winsdk.windows.media.control import (
     GlobalSystemMediaTransportControlsSessionManager as MediaManager,
@@ -133,6 +135,115 @@ def get_insult():
     return config.config["insults"][
         random.randint(0, len(config.config["insults"]) - 1)
     ]
+
+
+def is_window_visible(hwnd, screen_rect):
+    """
+    Window visibility check that determines if a window is likely
+    to be a main application window visible to the user.
+    """
+    # Get window style
+    style = win32gui.GetWindowLong(hwnd, win32con.GWL_STYLE)
+    ex_style = win32gui.GetWindowLong(hwnd, win32con.GWL_EXSTYLE)
+
+    # Skip empty window titles, minimised or invisible windows, tool windows and child windows
+    if (
+        not win32gui.GetWindowText(hwnd)
+        or not win32gui.IsWindowVisible(hwnd)
+        or win32gui.IsIconic(hwnd)
+        or (ex_style & win32con.WS_EX_TOOLWINDOW)
+        or (style & win32con.WS_CHILD)
+    ):
+        return False
+
+    try:
+        window_rect = win32gui.GetWindowRect(hwnd)
+
+        # Skip windows that are off-screen
+        if (
+            window_rect[2] < screen_rect[0]  # right edge < screen left
+            or window_rect[0] > screen_rect[2]  # left edge > screen right
+            or window_rect[3] < screen_rect[1]  # bottom edge < screen top
+            or window_rect[1] > screen_rect[3]
+        ):  # top edge > screen bottom
+            return False
+
+        # Skip tiny windows (likely system elements, not applications)
+        width = window_rect[2] - window_rect[0]
+        height = window_rect[3] - window_rect[1]
+        if width < 200 or height < 100:
+            return False
+
+        # Check if it's the foreground window
+        foreground_hwnd = win32gui.GetForegroundWindow()
+        if hwnd == foreground_hwnd:
+            return True
+
+        # Calculate window size and visible area threshold
+        window_area = width * height
+        min_visible_area = (
+            window_area * 0.2
+        )  # Window is visible if at least 20% is showing
+
+        # Find windows that could be obscuring this one
+        obscuring_windows = []
+
+        def enum_obscuring_windows(other_hwnd, _data):
+            if (
+                other_hwnd != hwnd
+                and win32gui.IsWindowVisible(other_hwnd)
+                and not win32gui.IsIconic(other_hwnd)
+            ):
+
+                # Get Z-order - only consider windows above this one
+                # Use GetWindow with GW_HWNDPREV to walk the Z-order
+                test_hwnd = win32gui.GetWindow(hwnd, win32con.GW_HWNDPREV)
+                is_above = False
+                while test_hwnd:
+                    if test_hwnd == other_hwnd:
+                        is_above = True
+                        break
+                    test_hwnd = win32gui.GetWindow(test_hwnd, win32con.GW_HWNDPREV)
+
+                if is_above:
+                    try:
+                        other_rect = win32gui.GetWindowRect(other_hwnd)
+                        # Check for overlap
+                        if (
+                            other_rect[0] < window_rect[2]
+                            and other_rect[2] > window_rect[0]
+                            and other_rect[1] < window_rect[3]
+                            and other_rect[3] > window_rect[1]
+                        ):
+
+                            obscuring_windows.append((other_hwnd, other_rect))
+                    except Exception:
+                        pass
+            return True
+
+        win32gui.EnumWindows(enum_obscuring_windows, None)
+
+        # Calculate visible area (simplified)
+        obscured_area = 0
+        for _, obscuring_rect in obscuring_windows:
+            # Calculate intersection area
+            overlap_left = max(window_rect[0], obscuring_rect[0])
+            overlap_top = max(window_rect[1], obscuring_rect[1])
+            overlap_right = min(window_rect[2], obscuring_rect[2])
+            overlap_bottom = min(window_rect[3], obscuring_rect[3])
+
+            if overlap_right > overlap_left and overlap_bottom > overlap_top:
+                overlap_area = (overlap_right - overlap_left) * (
+                    overlap_bottom - overlap_top
+                )
+                obscured_area += overlap_area
+
+        visible_area = window_area - obscured_area
+        return visible_area >= min_visible_area
+
+    except Exception as e:
+        print(f"Error checking window visibility: {e}")
+        return False
 
 
 async def pause_media() -> bool:
