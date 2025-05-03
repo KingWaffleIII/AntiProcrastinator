@@ -13,7 +13,6 @@ import actions
 # {pure_deadline} -> get_pure_deadline()
 # {insult} -> get_insult()
 # {timer_diff} -> get_timer_diff_in_text()
-# {window} -> window
 
 # Condition functions should be lambdas.
 # Avoid using Python, instead use the available functions in util.functions.
@@ -56,7 +55,7 @@ AfterProcrastinationActionSet = actions.Actionset(
     [
         actions.Notify(
             # text="[{timestamp}] You were procrastinating for {timer_diff} on {window}!"
-            text="You were procrastinating for {timer_diff} on {window}!"
+            text="You were procrastinating for {timer_diff}!"
         ),
         actions.Say(
             text="You retard, you were procrastinating for {timer_diff}! {insult}",

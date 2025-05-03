@@ -33,11 +33,10 @@ Features:
         -   `Notify`
 
     -   **Wildcards:**
-        -   `{deadline}` -> `get_deadline()`
-        -   `{pure_deadline}` -> `get_pure_deadline()`
-        -   `{insult}` -> `get_insult()`
-        -   `{timer_diff}` -> `get_timer_diff_in_text()`
-        -   `{window}` -> `window`
+        -   `{deadline}` → `get_deadline()`
+        -   `{pure_deadline}` → `get_pure_deadline()`
+        -   `{insult}` → `get_insult()`
+        -   `{timer_diff}` → `get_timer_diff_in_text()`
 
 -   (recommended but optional) Add to Task Scheduler or equivalent (put the executable in `shell:common startup` in Windows Explorer) to run on startup
 

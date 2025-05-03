@@ -197,18 +197,6 @@ def get_timer_diff_in_text() -> str:
     return get_time(round(get_timer_diff()))
 
 
-window = ""
-
-
-def set_window(w: str):
-    """
-    Sets the global window.
-    :param w: the window to set.
-    """
-    global window
-    window = w
-
-
 def replace_wildcards(text: str) -> str:
     """
     Replace custom wildcards in text.
@@ -216,7 +204,6 @@ def replace_wildcards(text: str) -> str:
     {pure_deadline} -> get_pure_deadline()
     {insult} -> get_insult()
     {timer_diff} -> get_timer_diff_in_text()
-    {window} -> window
     {timestamp} -> current timestamp (HH:MM:SS)
     :param text: text to replace wildcards in.
     :return: text with wildcards replaced.
@@ -226,7 +213,6 @@ def replace_wildcards(text: str) -> str:
         .replace("{pure_deadline}", get_pure_deadline())
         .replace("{insult}", get_insult())
         .replace("{timer_diff}", get_timer_diff_in_text())
-        .replace("{window}", window)
         .replace("{timestamp}", datetime.datetime.now().strftime("%H:%M:%S"))
     )
 
