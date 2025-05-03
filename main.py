@@ -79,15 +79,32 @@ async def watch(break_event, notif_conn):
                 procrastination_proc = None
             raise asyncio.CancelledError
 
-        window = win32gui.GetWindowText(win32gui.GetForegroundWindow())
-        if (
-            window
-            and any(x in window.lower() for x in util.config.config["blacklist"])
-            and not any(x in window.lower() for x in util.config.config["whitelist"])
+        # window = win32gui.GetWindowText(win32gui.GetForegroundWindow())
+        windows = []
+
+        def enumHandler(hwnd, _data):
+            if win32gui.IsWindowVisible(hwnd) and not win32gui.IsIconic(hwnd):
+                windows.append(win32gui.GetWindowText(hwnd))
+
+        win32gui.EnumWindows(enumHandler, 0)
+
+        # if (
+        #     window
+        #     and any(x in window.lower() for x in util.config.config["blacklist"])
+        #     and not any(x in window.lower() for x in util.config.config["whitelist"])
+        # ):
+        if any(
+            (
+                window
+                and any(x in window.lower() for x in util.config.config["blacklist"])
+                and not any(
+                    x in window.lower() for x in util.config.config["whitelist"]
+                )
+            )
+            for window in windows
         ):
             if procrastination_proc is None or not procrastination_proc.is_alive():
                 util.functions.start_timer()
-                util.functions.set_window(window)
                 procrastination_proc = Process(
                     target=procrastination,
                     args=(notif_conn,),
