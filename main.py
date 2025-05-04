@@ -91,8 +91,6 @@ async def watch(break_event, notif_conn):
 
         win32gui.EnumWindows(enumHandler, 0)
 
-        print(windows)
-
         if any(
             (
                 window
@@ -117,8 +115,6 @@ async def watch(break_event, notif_conn):
                 procrastination_proc = None
 
                 await AfterProcrastinationActionSet.execute()
-
-                time.sleep(60)
 
         time.sleep(1)
 
