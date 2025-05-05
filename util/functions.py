@@ -215,8 +215,11 @@ def is_window_visible(hwnd, screen_rect):
                             and other_rect[1] < window_rect[3]
                             and other_rect[3] > window_rect[1]
                         ):
-
-                            obscuring_windows.append((other_hwnd, other_rect))
+                            if not any(
+                                x in win32gui.GetWindowText(other_hwnd).lower()
+                                for x in ["sharex"]
+                            ):
+                                obscuring_windows.append((other_hwnd, other_rect))
                     except Exception:
                         pass
             return True
