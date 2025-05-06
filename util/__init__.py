@@ -33,6 +33,7 @@ def run_configurator():
 
 
 break_event = multiprocessing.Event()
+term_event = multiprocessing.Event()
 
 
 def take_break():
@@ -70,6 +71,11 @@ def notify_worker():
             time.sleep(1)
 
 
+def exit_icon(i):
+    term_event.set()
+    i.stop()
+
+
 icon = pystray.Icon(
     "AntiProcrastinator",
     Image.open(functions.eval_file_path(r"{runtime_dir}\icon.png")),
@@ -86,7 +92,7 @@ icon = pystray.Icon(
         ),
         pystray.MenuItem(
             "Exit",
-            lambda icon: icon.stop(),
+            exit_icon,
         ),
     ),
 )

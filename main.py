@@ -70,11 +70,11 @@ def procrastination(notif_conn):
         asyncio.run(OnProcrastinationActionSet.execute())
 
 
-async def watch(break_event, notif_conn):
+async def watch(break_event, term_event, notif_conn):
     procrastination_proc: multiprocessing.Process | None = None
 
     while True:
-        if break_event.is_set():
+        if break_event.is_set() or term_event.is_set():
             if procrastination_proc is not None and procrastination_proc.is_alive():
                 procrastination_proc.kill()
                 procrastination_proc = None
@@ -119,12 +119,14 @@ async def watch(break_event, notif_conn):
         time.sleep(1)
 
 
-def run_watchdog(break_event, notif_conn):
+def run_watchdog(break_event, term_event, notif_conn):
     util.functions.set_notification_pipe(notif_conn)
     while True:
+        if term_event.is_set():
+            break
         if not break_event.is_set():
             try:
-                asyncio.run(watch(break_event, notif_conn))
+                asyncio.run(watch(break_event, term_event, notif_conn))
             except asyncio.CancelledError:
                 continue
         else:
@@ -138,7 +140,7 @@ if __name__ == "__main__":
 
     watchdog = Process(
         target=run_watchdog,
-        args=(util.break_event, util.notif_send_conn),
+        args=(util.break_event, util.term_event, util.notif_send_conn),
         name="watchdog",
     )
     watchdog.start()
@@ -151,5 +153,4 @@ if __name__ == "__main__":
     try:
         util.icon.run()
     finally:
-        if watchdog.is_alive():
-            watchdog.kill()
+        watchdog.join()
