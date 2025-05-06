@@ -1,0 +1,82 @@
+{% extends "base.html" %} {% block content %}
+<h3>{{ name.replace("_", " ").capitalize() }}</h3>
+
+<h5>Click to edit or remove</h5>
+
+<ol class="list-group list-group-numbered">
+	{% for action in actions %}
+	<btn
+		class="list-group-item list-group-item-danger list-group-item-action d-flex justify-content-between align-items-start"
+		data-bs-toggle="modal"
+		data-bs-target="#modal-{{ actions.index(action) }}"
+	>
+		<div class="ms-2 me-auto">
+			<div class="fw-bold">{{ action["name"] }}</div>
+		</div>
+	</btn>
+	<div
+		class="modal fade"
+		id="modal-{{ actions.index(action) }}"
+		tabindex="-1"
+		aria-hidden="true"
+	>
+		<div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content bg-dark">
+				<div class="modal-header">
+					<h1 class="modal-title fs-5" id="exampleModalLabel">
+						action["name"]
+					</h1>
+					<button
+						type="button"
+						class="btn-close"
+						data-bs-dismiss="modal"
+						aria-label="Close"
+					></button>
+				</div>
+				<div class="modal-body">
+					{% for k, v in action.items() %} {% if k != "name" %}
+					<div class="mb-3">
+						<label for="{{ k }}" class="form-label">{{ k }}</label>
+                        {% if v == True or v == False %}
+                        <select
+                            class="form-select"
+                            id="{{ k }}"
+                            name="{{ k }}"
+                            required
+                        >
+
+                            <option value="True" {% if v == True %}selected{% endif %}>True</option>
+                            <option value="False" {% if v == False %}selected{% endif %}>False</option>
+                        </select>
+                        {% else %}
+						<input
+							type="text"
+							class="form-control"
+							id="{{ k }}"
+							name="{{ k }}"
+							value="{{ v }}"
+							placeholder="{{ k }}"
+							required
+						/>
+                        {% endif %}
+					</div>
+					{% endif %} {% endfor %}
+				</div>
+				<div class="modal-footer">
+					<button
+						type="button"
+						class="btn btn-danger"
+						onclick="window.location.href='/actions/{{ name.lower() }}/remove/{{ actions.index(action) }}'"
+					>
+						Delete
+					</button>
+					<button type="button" class="btn btn-primary">Save</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	{% endfor %} {% if actions|length == 0 %}
+	<h4 class="text-center">No actions.</h4>
+	{% endif %}
+</ol>
+{% endblock %}

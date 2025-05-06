@@ -12,7 +12,6 @@ Features:
 -   Pauses any media you're playing to yell at you
 -   Regularly reminds you how close your deadline is
 -   Customisable insults
--   Realtime config changes (no need to restart the program)
 -   Completely customisable actions (e.g. play a sound, print to console, etc.)
     -   Extending the project and adding your own actions is very simple by simply extending `action.Action`.
     -   You can make actions from emailing someone to shutting down your computer.
@@ -34,10 +33,10 @@ Features:
         -   `Notify`
 
     -   **Wildcards:**
-        -   `{deadline}` -> `get_deadline()`
-        -   `{insult}` -> `get_insult()`
-        -   `{timer_diff}` -> `get_timer_diff_in_text()`
-        -   `{window}` -> `window`
+        -   `{deadline}` → `get_deadline()`
+        -   `{pure_deadline}` → `get_pure_deadline()`
+        -   `{insult}` → `get_insult()`
+        -   `{timer_diff}` → `get_timer_diff_in_text()`
 
 -   (recommended but optional) Add to Task Scheduler or equivalent (put the executable in `shell:common startup` in Windows Explorer) to run on startup
 
@@ -48,4 +47,4 @@ Enable this if you use Task Scheduler else TTS will not work:
 
 You can run the Python script from cloning or the executable from releases, **but make sure to have `config.json` in the same directory**.
 
-Note: when using `actions.PlaySound`, remember to add the sound files to `AntiProcrastinator.spec` if using Pyinstaller.
+Note: when using `actions.PlaySound`, remember to add the sound files to the `data` directory.

@@ -8,6 +8,7 @@ import threading
 import time
 
 import win32gui
+import win32api
 
 import actions
 import util
@@ -69,28 +70,42 @@ def procrastination(notif_conn):
         asyncio.run(OnProcrastinationActionSet.execute())
 
 
-async def watch(break_event):
+async def watch(break_event, term_event, notif_conn):
     procrastination_proc: multiprocessing.Process | None = None
 
     while True:
-        if break_event.is_set():
+        if break_event.is_set() or term_event.is_set():
             if procrastination_proc is not None and procrastination_proc.is_alive():
                 procrastination_proc.kill()
                 procrastination_proc = None
             raise asyncio.CancelledError
 
-        window = win32gui.GetWindowText(win32gui.GetForegroundWindow())
-        if (
-            window
-            and any(x in window.lower() for x in util.config.config["blacklist"])
-            and not any(x in window.lower() for x in util.config.config["whitelist"])
+        windows = []
+
+        def enumHandler(hwnd, _data):
+            screen_width = win32api.GetSystemMetrics(0)
+            screen_height = win32api.GetSystemMetrics(1)
+            screen_rect = (0, 0, screen_width, screen_height)
+            if util.functions.is_window_visible(hwnd, screen_rect):
+                windows.append(win32gui.GetWindowText(hwnd))
+
+        win32gui.EnumWindows(enumHandler, 0)
+
+        if any(
+            (
+                window
+                and any(x in window.lower() for x in util.config.config["blacklist"])
+                and not any(
+                    x in window.lower() for x in util.config.config["whitelist"]
+                )
+            )
+            for window in windows
         ):
             if procrastination_proc is None or not procrastination_proc.is_alive():
                 util.functions.start_timer()
-                util.functions.set_window(window)
                 procrastination_proc = Process(
                     target=procrastination,
-                    args=(util.notif_send_conn,),
+                    args=(notif_conn,),
                     name="procrastination",
                 )
                 procrastination_proc.start()
@@ -101,17 +116,17 @@ async def watch(break_event):
 
                 await AfterProcrastinationActionSet.execute()
 
-                time.sleep(60)
-
         time.sleep(1)
 
 
-def run_watchdog(break_event, notif_conn):
+def run_watchdog(break_event, term_event, notif_conn):
     util.functions.set_notification_pipe(notif_conn)
     while True:
+        if term_event.is_set():
+            break
         if not break_event.is_set():
             try:
-                asyncio.run(watch(break_event))
+                asyncio.run(watch(break_event, term_event, notif_conn))
             except asyncio.CancelledError:
                 continue
         else:
@@ -125,7 +140,7 @@ if __name__ == "__main__":
 
     watchdog = Process(
         target=run_watchdog,
-        args=(util.break_event, util.notif_send_conn),
+        args=(util.break_event, util.term_event, util.notif_send_conn),
         name="watchdog",
     )
     watchdog.start()
@@ -138,5 +153,4 @@ if __name__ == "__main__":
     try:
         util.icon.run()
     finally:
-        if watchdog.is_alive():
-            watchdog.kill()
+        watchdog.join()

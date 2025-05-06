@@ -10,24 +10,16 @@ import actions
 
 # Wildcards:
 # {deadline} -> get_deadline()
+# {pure_deadline} -> get_pure_deadline()
 # {insult} -> get_insult()
 # {timer_diff} -> get_timer_diff_in_text()
-# {window} -> window
 
 # Condition functions should be lambdas.
-# Avoid using Python, rather use the available functions in util.functions.
+# Avoid using Python, instead use the available functions in util.functions.
 # If you want to use something not implemented, you can add it to util/functions.py.
 
 OnStartupActionSet = actions.Actionset(
     [
-        actions.Say(
-            text="Good luck bro, the deadline has passed.",
-            pause_media=True,
-            condition_func="lambda: util.functions.has_deadline_passed()",
-        ),
-        actions.Exit(
-            condition_func="lambda: util.functions.has_deadline_passed()",
-        ),
         actions.Say(
             text="{deadline}Time to lock in!",
             pause_media=True,
@@ -54,6 +46,7 @@ OnProcrastinationActionSet = actions.Actionset(
         ),
         actions.Playsound(
             file_path=r"{runtime_dir}\annoying.mp3",
+            pause_media=True,
         ),
     ]
 )
@@ -62,7 +55,7 @@ AfterProcrastinationActionSet = actions.Actionset(
     [
         actions.Notify(
             # text="[{timestamp}] You were procrastinating for {timer_diff} on {window}!"
-            text="You were procrastinating for {timer_diff} on {window}!"
+            text="You were procrastinating for {timer_diff}!"
         ),
         actions.Say(
             text="You retard, you were procrastinating for {timer_diff}! {insult}",
